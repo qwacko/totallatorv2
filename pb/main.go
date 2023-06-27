@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	hooks "pocketbase/hooks"
+	// hooks "pocketbase/hooks"
 
 	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/pocketbase"
@@ -53,7 +53,7 @@ func main() {
 	})
 
 	// call this only if you want to use the configurable "hooks" functionality
-	hooks.PocketBaseInit(app)
+	// hooks.PocketBaseInit(app)
 
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		// serves static files from the provided public dir (if exists)
