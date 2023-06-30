@@ -74,25 +74,28 @@ func main() {
 		return nil
 	})
 
-	app.OnRecordBeforeCreateRequest().Add(func(e *core.RecordCreateEvent) error {
-		if e.Record.Collection().Name == "posts" {
-			log.Println(e.Record)
-			log.Println(e.HttpContext)
-		}
-
+	//Update Combined Title for Tags and Categories
+	app.OnRecordBeforeCreateRequest("tags", "categories").Add(func(e *core.RecordCreateEvent) error {
+		e.Record.Set("combinedTitle", e.Record.GetString("group")+string('/')+e.Record.GetString("title"))
 		return nil
 	})
 
-	app.OnRecordBeforeUpdateRequest().Add((func(e *core.RecordUpdateEvent) error {
-		if e.Record.Collection().Name == "posts" {
-			log.Println("Updating Post Record")
-			log.Println(e.Record.Get("title"))
-			log.Println(e.Record.OriginalCopy().Get("title"))
-			log.Println("Record Update Complete")
-		}
-
+	//Update Combined Title for Tags and Categories
+	app.OnRecordBeforeUpdateRequest("tags", "categories").Add(func(e *core.RecordUpdateEvent) error {
+		e.Record.Set("combinedTitle", e.Record.GetString("group")+string('/')+e.Record.GetString("title"))
 		return nil
-	}))
+	})
+
+	// app.OnRecordBeforeUpdateRequest().Add((func(e *core.RecordUpdateEvent) error {
+	// 	if e.Record.Collection().Name == "posts" {
+	// 		log.Println("Updating Post Record")
+	// 		log.Println(e.Record.Get("title"))
+	// 		log.Println(e.Record.OriginalCopy().Get("title"))
+	// 		log.Println("Record Update Complete")
+	// 	}
+
+	// 	return nil
+	// }))
 
 	app.OnRecordAfterUpdateRequest()
 
