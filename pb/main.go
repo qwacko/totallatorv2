@@ -86,17 +86,6 @@ func main() {
 		return nil
 	})
 
-	// app.OnRecordBeforeUpdateRequest().Add((func(e *core.RecordUpdateEvent) error {
-	// 	if e.Record.Collection().Name == "posts" {
-	// 		log.Println("Updating Post Record")
-	// 		log.Println(e.Record.Get("title"))
-	// 		log.Println(e.Record.OriginalCopy().Get("title"))
-	// 		log.Println("Record Update Complete")
-	// 	}
-
-	// 	return nil
-	// }))
-
 	app.OnRecordAfterUpdateRequest()
 
 	if err := app.Start(); err != nil {

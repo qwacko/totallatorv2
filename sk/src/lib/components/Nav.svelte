@@ -4,11 +4,10 @@
   import Login from "./Login.svelte";
   const links = [
     ["Home", "/"],
-    ["Posts", "/posts"],
-    ["Hello", "/hello"],
+    ["Accounts", "/accounts/"],
   ].map(([text, href]) => [
     text,
-    base + href.replace(/\/?$/, "/"), // prefix=base, suffix=a trailing slash if not present
+    href
   ]);
 </script>
 

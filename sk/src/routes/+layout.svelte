@@ -26,9 +26,7 @@
 </svelte:head>
 
 <header>
-  <a href={`&#x24;{base}/`} class="logo"
-    ><img src={`&#x24;{base}/favicon.ico`} alt="application logo" /></a
-  >
+
   <Nav />
   <Login />
 </header>
@@ -48,9 +46,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    .logo {
-      width: 2rem;
-      height: 2rem;
-    }
+    
   }
 </style>

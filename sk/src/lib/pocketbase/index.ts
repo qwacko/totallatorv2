@@ -6,9 +6,9 @@ import {
   type Readable,
   type Subscriber,
 } from "svelte/store";
-import type { BaseSystemFields } from "./generated-types";
+import type { BaseSystemFields, Collections } from "./generated-types";
 
-export const client = new PocketBase();
+export const client = new PocketBase("http://192.168.0.104:8090/");
 
 client.authStore.onChange(function () {
   currentUser.set(client.authStore.model);
@@ -76,24 +76,25 @@ export interface PageStore<T extends Record<any, any>>
 }
 
 // realtime subscription on a collection, with pagination
-export function watch<T extends Record<any, any> & BaseSystemFields>(
-  idOrName: string,
+export function watch<T extends Record<string, any> & BaseSystemFields<unknown>>(
+  idOrName: Collections,
   queryParams = {} as any,
   page = 1,
   perPage = 20
 ): PageStore<T> {
   const collection = client.collection(idOrName);
-  let result = new ListResult(page, perPage, 0, 0, [] as Record<any, any>[]);
-  let set: Subscriber<ListResult<Record<any, any>>>;
+  let result = new ListResult<T>(page, perPage, 0, 0, [] as Record<any, any>[]);
+  let set: Subscriber<ListResult<T>>;
   const store = readable(result, (_set) => {
     set = _set;
     // fetch first page
     collection
-      .getList(page, perPage, queryParams)
+      .getList<T>(page, perPage, queryParams)
       .then((r) => set((result = r)));
     // watch for changes (only if you're in the browser)
     if (browser)
-      collection.subscribe("*", ({ action, record }) => {
+      console.log("Browser Subscribing")
+      collection.subscribe<T>("*", ({ action, record }) => {
         (async function (action: string) {
           // see https://github.com/pocketbase/pocketbase/discussions/505
           async function expand(expand: any, record: any) {

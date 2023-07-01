@@ -3,74 +3,121 @@
 */
 
 export enum Collections {
-	Hooks = "hooks",
-	Posts = "posts",
+	Accounts = "accounts",
+	Bills = "bills",
+	Budgets = "budgets",
+	Categories = "categories",
+	Tags = "tags",
+	Transactions = "transactions",
 	Users = "users",
 }
 
 // Alias types for improved usability
 export type IsoDateString = string
 export type RecordIdString = string
+export type HTMLString = string
 
 // System fields
-export type BaseSystemFields = {
+export type BaseSystemFields<T = never> = {
 	id: RecordIdString
 	created: IsoDateString
 	updated: IsoDateString
 	collectionId: string
 	collectionName: Collections
-	expand?: { [key: string]: any }
+	expand?: T
 }
 
-export type AuthSystemFields = {
+export type AuthSystemFields<T = never> = {
 	email: string
 	emailVisibility: boolean
 	username: string
 	verified: boolean
-} & BaseSystemFields
+} & BaseSystemFields<T>
 
 // Record types for each collection
 
-export enum HooksEventOptions {
-	"insert" = "insert",
-	"update" = "update",
-	"delete" = "delete",
+export enum AccountsTypeOptions {
+	"asset" = "asset",
+	"liability" = "liability",
+	"income" = "income",
+	"expense" = "expense",
+}
+export type AccountsRecord = {
+	title?: string
+	type: AccountsTypeOptions
+	isCash?: boolean
+	isNetWorth?: boolean
 }
 
-export enum HooksActionTypeOptions {
-	"command" = "command",
-	"post" = "post",
-}
-export type HooksRecord = {
-	collection: string
-	event: HooksEventOptions
-	action_type: HooksActionTypeOptions
-	action: string
-	action_params?: string
-	expands?: string
-	disabled?: boolean
-}
-
-export type PostsRecord = {
+export type BillsRecord = {
 	title: string
-	body: string
-	slug: string
-	files?: string[]
-	user?: RecordIdString
 }
 
+export type BudgetsRecord = {
+	title: string
+}
+
+export type CategoriesRecord = {
+	title?: string
+	group?: string
+	combinedTitle?: string
+}
+
+export type TagsRecord = {
+	title: string
+	group: string
+	combinedTitle?: string
+}
+
+export type TransactionsRecord = {
+	fromAccount: RecordIdString
+	toAccount: RecordIdString
+	description?: string
+	amount?: number
+	tag?: RecordIdString
+	bill?: RecordIdString
+	budget?: RecordIdString
+	category?: RecordIdString
+	date: IsoDateString
+}
+
+export enum UsersRoleOptions {
+	"view" = "view",
+	"admin" = "admin",
+}
 export type UsersRecord = {
 	name?: string
 	avatar?: string
+	role?: UsersRoleOptions
 }
 
 // Response types include system fields and match responses from the PocketBase API
-export type HooksResponse = HooksRecord & BaseSystemFields
-export type PostsResponse = PostsRecord & BaseSystemFields
-export type UsersResponse = UsersRecord & AuthSystemFields
+export type AccountsResponse<Texpand = unknown> = Required<AccountsRecord> & BaseSystemFields<Texpand>
+export type BillsResponse<Texpand = unknown> = Required<BillsRecord> & BaseSystemFields<Texpand>
+export type BudgetsResponse<Texpand = unknown> = Required<BudgetsRecord> & BaseSystemFields<Texpand>
+export type CategoriesResponse<Texpand = unknown> = Required<CategoriesRecord> & BaseSystemFields<Texpand>
+export type TagsResponse<Texpand = unknown> = Required<TagsRecord> & BaseSystemFields<Texpand>
+export type TransactionsResponse<Texpand = unknown> = Required<TransactionsRecord> & BaseSystemFields<Texpand>
+export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+
+// Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
-	hooks: HooksRecord
-	posts: PostsRecord
+	accounts: AccountsRecord
+	bills: BillsRecord
+	budgets: BudgetsRecord
+	categories: CategoriesRecord
+	tags: TagsRecord
+	transactions: TransactionsRecord
 	users: UsersRecord
+}
+
+export type CollectionResponses = {
+	accounts: AccountsResponse
+	bills: BillsResponse
+	budgets: BudgetsResponse
+	categories: CategoriesResponse
+	tags: TagsResponse
+	transactions: TransactionsResponse
+	users: UsersResponse
 }
