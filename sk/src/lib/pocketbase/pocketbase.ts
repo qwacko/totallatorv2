@@ -1,25 +1,30 @@
 import { browser } from "$app/environment";
-import type { ListResult, RecordListQueryParams } from "pocketbase";
+import type { ListResult, RecordListQueryParams, RecordService } from "pocketbase";
 import { writable, derived, get } from "svelte/store";
 import type { BaseSystemFields, Collections } from "./generated-types";
-import { client } from ".";
+
+export type ExportFilteredStoreParams = {
+  collection: RecordService,
+  initialQueryParams?: RecordListQueryParams;
+  initialPage?: number;
+  initialPerPage?: number;
+}
 
 // realtime subscription on a collection, with pagination
 export function subscribeFilteredStore<
   T extends Record<string, any> & BaseSystemFields<unknown>
->(
-  idOrName: Collections,
-  initalQueryParams: RecordListQueryParams,
+>({
+ collection,
+  initialQueryParams,
   initialPage = 1,
-  initialPerPage = 20
-) {
-  const collection = client.collection(idOrName);
+  initialPerPage = 20,
+}: ExportFilteredStoreParams ) {
 
   const date = new Date();
   const dateStore = writable(date.getTime());
   const pageStore = writable<number>(initialPage);
   const perPageStore = writable<number>(initialPerPage);
-  const queryParamsStore = writable(initalQueryParams);
+  const queryParamsStore = writable(initialQueryParams);
   const triggerStores = [
     queryParamsStore,
     pageStore,
@@ -41,8 +46,37 @@ export function subscribeFilteredStore<
     }
   );
 
+  const makePageWithRange = (
+    page: number,
+    results: ListResult<T> | undefined
+  ) => {
+    if (results && results.totalPages !== undefined) {
+      const minPage = 1;
+      const maxPage = results.totalPages;
+
+      if (page > maxPage) {
+        pageStore.set(maxPage);
+      }
+
+      if (page < minPage) {
+        pageStore.set(minPage);
+      }
+    }
+  };
+
+  //Make sure the page number is correct (not outside range).
+  //Checks the page number and results when either changes to allow
+  //for external modification of page store (outside of this function)
+  resultStore.subscribe((newResults) => {
+    makePageWithRange(get(pageStore), newResults);
+  });
+  pageStore.subscribe((newPage) => {
+    makePageWithRange(newPage, get(resultStore));
+  });
+
   //Automatically Triggers Update On Change in underlying dataset.
   //This is done by updating a value (dateStore) that the derived store listens to.
+  //Not the most efficient as this repeats the current request, but seems the simplest way.
   if (browser) {
     collection.subscribe("*", () => {
       const subscribeDate = new Date();
@@ -51,7 +85,12 @@ export function subscribeFilteredStore<
   }
 
   async function setPage(newPage: number) {
-    pageStore.set(newPage);
+    const minPage = 1;
+    const maxPage = get(resultStore).totalPages;
+
+    if (newPage <= maxPage && newPage >= minPage) {
+      pageStore.set(newPage);
+    }
   }
 
   return {

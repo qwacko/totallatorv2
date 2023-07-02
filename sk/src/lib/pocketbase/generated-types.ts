@@ -3,6 +3,7 @@
 */
 
 export enum Collections {
+	AccountSummary = "account_summary",
 	Accounts = "accounts",
 	Bills = "bills",
 	Budgets = "budgets",
@@ -35,6 +36,24 @@ export type AuthSystemFields<T = never> = {
 } & BaseSystemFields<T>
 
 // Record types for each collection
+
+export enum AccountSummaryAccountTypeOptions {
+	"asset" = "asset",
+	"liability" = "liability",
+	"income" = "income",
+	"expense" = "expense",
+}
+export type AccountSummaryRecord<Tmonth = unknown, Trunning_total = unknown, Tsum_from_transactions = unknown, Tsum_to_transactions = unknown> = {
+	account_id?: RecordIdString
+	account_title?: string
+	account_type: AccountSummaryAccountTypeOptions
+	month?: null | Tmonth
+	num_from_transactions?: number
+	num_to_transactions?: number
+	sum_from_transactions?: null | Tsum_from_transactions
+	sum_to_transactions?: null | Tsum_to_transactions
+	running_total?: null | Trunning_total
+}
 
 export enum AccountsTypeOptions {
 	"asset" = "asset",
@@ -92,6 +111,7 @@ export type UsersRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
+export type AccountSummaryResponse<Tmonth = unknown, Trunning_total = unknown, Tsum_from_transactions = unknown, Tsum_to_transactions = unknown, Texpand = unknown> = Required<AccountSummaryRecord<Tmonth, Trunning_total, Tsum_from_transactions, Tsum_to_transactions>> & BaseSystemFields<Texpand>
 export type AccountsResponse<Texpand = unknown> = Required<AccountsRecord> & BaseSystemFields<Texpand>
 export type BillsResponse<Texpand = unknown> = Required<BillsRecord> & BaseSystemFields<Texpand>
 export type BudgetsResponse<Texpand = unknown> = Required<BudgetsRecord> & BaseSystemFields<Texpand>
@@ -103,6 +123,7 @@ export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSyste
 // Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
+	account_summary: AccountSummaryRecord
 	accounts: AccountsRecord
 	bills: BillsRecord
 	budgets: BudgetsRecord
@@ -113,6 +134,7 @@ export type CollectionRecords = {
 }
 
 export type CollectionResponses = {
+	account_summary: AccountSummaryResponse
 	accounts: AccountsResponse
 	bills: BillsResponse
 	budgets: BudgetsResponse

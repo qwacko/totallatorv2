@@ -1,61 +1,30 @@
 <script lang="ts">
   import { metadata } from "$lib/app/stores";
-  import {
-    Collections,
-    type AccountsResponse,
-    AccountsTypeOptions,
-  } from "$lib/pocketbase/generated-types";
-  import { subscribeFilteredStore } from "$lib/pocketbase/pocketbase";
-  import { writable } from "svelte/store";
+  import { pbAccounts } from "$lib/pocketbase/pbAccounts";
 
   $metadata.title = "Accounts";
 
-  const newAccounts = subscribeFilteredStore<AccountsResponse>(
-    Collections.Accounts,
-    { filter: "title ~ 'account'" },
-    1,
-    5
-  );
-
-  let titleFilter = writable("");
-
-  type AccountFilterType = {
-    title?: string | undefined;
-    type?: AccountsTypeOptions[] | undefined;
-  };
-  const accountFilter = (filter: AccountFilterType | undefined) => {
-    if (!filter) {
-      return "";
-    }
-    let filterArray: string[] = [];
-    if (filter.title) {
-      filterArray.push(`title ~ '${filter.title}'`);
-    }
-    if(filter.type && filter.type.length > 0){
-        const mappedFilter =  filter.type.map(item => `type = '${item}'`)
-        const concatFilter = mappedFilter.join(" || ")
-        filterArray.push("(" + concatFilter + ")")
-    }
-
-    return filterArray.join(" && ");
-  };
-
-  const updateFilter = (titleSearch: string) => {
-    const filter = accountFilter({ title: titleSearch , type: [AccountsTypeOptions.asset]});
-    newAccounts.queryParamsStore.set({ filter });
-  };
-
-  $: updateFilter($titleFilter);
+  const { filterStore, ...accountsStore } =
+    pbAccounts.accounts.subscribeList({
+      initialPerPage: 5,
+      initialFilter: { title: "" },
+      initialSort: [{ key: "title", dir: "asc" }],
+    });
 </script>
 
-<input bind:value={$titleFilter} type="text" class="flex" />
-{$titleFilter}
-{#if $newAccounts?.items}
+<input bind:value={$filterStore.title} type="text" class="flex" />
+{#if $accountsStore?.items}
   <table>
-    {#each $newAccounts.items as currentAccount}
+    {#each $accountsStore.items as currentAccount}
       <tr>
-        <td>New - {currentAccount.title}</td>
+        <td>{currentAccount.title}</td>
       </tr>
     {/each}
   </table>
+  <button on:click={accountsStore.prev}>Prev</button>
+  {$accountsStore.page} / {$accountsStore.totalPages}
+  <button on:click={accountsStore.next}>Next</button>
 {/if}
+<form on:submit|preventDefault={(e) => console.log(e)}>
+  <input type="text" id="title" />
+</form>
