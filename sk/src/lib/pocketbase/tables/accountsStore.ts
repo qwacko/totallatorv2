@@ -3,9 +3,8 @@ import type {
   AccountsTypeOptions,
   AccountsRecord,
   AccountsResponse,
-} from "./generated-types";
-import type { ExportFilteredStoreParams } from "./pocketbase";
-import { subscribeList } from "./subscribeList";
+} from "../generated-types";
+import { pocketbaseHelper } from "../helpers/pocketbaseHelper";
 
 export type AccountFilterType = {
   title?: string | undefined;
@@ -42,21 +41,17 @@ export const accountSort = (sort: AccountSortType) => {
     .join(",");
 };
 
-export const accounts = (collection: RecordService) => ({
-  subscribeList: subscribeList<
+export const accounts = (collection: RecordService) =>
+  pocketbaseHelper<
     AccountsResponse,
     AccountFilterType,
-    AccountSortType
+    AccountSortType,
+    AccountsRecord
   >({
     collection,
     filterToText: accountFilter,
     sortToText: accountSort,
     defaultFilter: { title: "" },
     defaultSort: [{ key: "title", dir: "asc" }],
-  }),
-  add: async (newAccount: AccountsRecord) =>
-    collection.create<AccountsRecord>(newAccount),
-  update: async ({ id, data }: { id: string; data: Partial<AccountsRecord> }) =>
-    collection.update<AccountsRecord>(id, data),
-  delete: async (id: string) => collection.update<AccountsRecord>(id),
-});
+  });
+

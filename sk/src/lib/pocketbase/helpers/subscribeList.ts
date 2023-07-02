@@ -1,12 +1,12 @@
 import type { RecordService, RecordListQueryParams } from "pocketbase";
-import type { BaseSystemFields } from "./generated-types";
+import type { BaseSystemFields } from "../generated-types";
 import {
   subscribeFilteredStore,
   type ExportFilteredStoreParams,
-} from "./pocketbase";
+} from "../pocketbase";
 import { get, writable } from "svelte/store";
 
-export type SubscribeListParams<
+export type SubscribeListInnerParams<
   FilterType extends Record<string, any>,
   SortType extends Array<Record<string, any>>
 > = Omit<
@@ -17,6 +17,18 @@ export type SubscribeListParams<
   initialSort?: SortType;
 };
 
+export type SubscribeListOuterType<
+  FilterType extends Record<string, any>,
+  SortType extends Array<Record<string, any>>
+> = {
+  collection: RecordService;
+  filterToText: (data: FilterType) => string;
+  sortToText: (data: SortType) => string;
+  defaultFilter: FilterType;
+  defaultSort: SortType;
+  defaultPage?: number;
+  defaultPerPage?: number;
+};
 
 export const subscribeList = <
   ResponseType extends Record<string, any> & BaseSystemFields<unknown>,
@@ -30,21 +42,13 @@ export const subscribeList = <
   defaultSort,
   defaultPage = 1,
   defaultPerPage = 20,
-}: {
-  collection: RecordService;
-  filterToText: (data: FilterType) => string;
-  sortToText: (data: SortType) => string;
-  defaultFilter: FilterType;
-  defaultSort: SortType;
-  defaultPage?: number;
-  defaultPerPage?: number;
-}) => {
+}: SubscribeListOuterType<FilterType, SortType>) => {
   return ({
     initialFilter,
     initialSort,
     initialPage,
     initialPerPage,
-  }: SubscribeListParams<FilterType, SortType>) => {
+  }: SubscribeListInnerParams<FilterType, SortType>) => {
     //Initialise the query.
     const initalFilterString = filterToText(initialFilter || defaultFilter);
     const initialSortString = sortToText(initialSort || defaultSort);
