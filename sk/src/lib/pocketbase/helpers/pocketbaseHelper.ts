@@ -31,5 +31,11 @@ export const pocketbaseHelper = <
     update: async ({ id, data }: { id: string; data: Partial<RecordType> }) =>
       collection.update<RecordType>(id, data),
     delete: async (id: string) => collection.delete(id),
+    getList: async ({filter = defaultFilter, sort = defaultSort, page = 1, perPage = 20} : {filter?: FilterType, sort?: SortType, page?: number, perPage?: number} = {}) => {
+      const data = await collection.getList(page,perPage, {filter: filterToText(filter), sort: sortToText(sort)})
+      return data
+    }, 
+    getItem: async (id: string) => collection.getOne(id)
   };
 };
+

@@ -1,25 +1,28 @@
 import { browser } from "$app/environment";
-import type { ListResult, RecordListQueryParams, RecordService } from "pocketbase";
+import type {
+  ListResult,
+  RecordListQueryParams,
+  RecordService,
+} from "pocketbase";
 import { writable, derived, get } from "svelte/store";
 import type { BaseSystemFields, Collections } from "./generated-types";
 
 export type ExportFilteredStoreParams = {
-  collection: RecordService,
+  collection: RecordService;
   initialQueryParams?: RecordListQueryParams;
   initialPage?: number;
   initialPerPage?: number;
-}
+};
 
 // realtime subscription on a collection, with pagination
 export function subscribeFilteredStore<
   T extends Record<string, any> & BaseSystemFields<unknown>
 >({
- collection,
+  collection,
   initialQueryParams,
   initialPage = 1,
   initialPerPage = 20,
-}: ExportFilteredStoreParams ) {
-
+}: ExportFilteredStoreParams) {
   const date = new Date();
   const dateStore = writable(date.getTime());
   const pageStore = writable<number>(initialPage);
@@ -56,11 +59,15 @@ export function subscribeFilteredStore<
 
       if (page > maxPage) {
         pageStore.set(maxPage);
+        return true;
       }
 
       if (page < minPage) {
         pageStore.set(minPage);
+        return true;
       }
+
+      return false;
     }
   };
 
@@ -71,7 +78,10 @@ export function subscribeFilteredStore<
     makePageWithRange(get(pageStore), newResults);
   });
   pageStore.subscribe((newPage) => {
-    makePageWithRange(newPage, get(resultStore));
+    const neededUpdating = makePageWithRange(newPage, get(resultStore));
+    if (!neededUpdating) {
+      queryParamsStore.update((t) => ({ ...t, page: newPage }));
+    }
   });
 
   //Automatically Triggers Update On Change in underlying dataset.

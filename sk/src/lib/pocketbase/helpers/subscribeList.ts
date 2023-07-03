@@ -3,7 +3,7 @@ import type { BaseSystemFields } from "../generated-types";
 import {
   subscribeFilteredStore,
   type ExportFilteredStoreParams,
-} from "../pocketbase";
+} from "../pocketbase"; 
 import { get, writable } from "svelte/store";
 
 export type SubscribeListInnerParams<
@@ -50,6 +50,7 @@ export const subscribeList = <
     initialPerPage,
   }: SubscribeListInnerParams<FilterType, SortType>) => {
     //Initialise the query.
+    console.log("Running Inner Subscribe List")
     const initalFilterString = filterToText(initialFilter || defaultFilter);
     const initialSortString = sortToText(initialSort || defaultSort);
     const initialQueryParams: RecordListQueryParams = {
@@ -72,6 +73,7 @@ export const subscribeList = <
 
     //Generate Function to Update Query based on filtering and sorting
     const updateQueryParams = () => {
+      console.log("Updating Query Parameters")
       listStore.queryParamsStore.update((currentQueryParams) => ({
         ...currentQueryParams,
         filter: filterToText(get(filterStore)),
