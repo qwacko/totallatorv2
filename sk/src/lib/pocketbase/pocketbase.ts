@@ -5,7 +5,7 @@ import type {
   RecordService,
 } from "pocketbase";
 import { writable, derived, get } from "svelte/store";
-import type { BaseSystemFields, Collections } from "./generated-types";
+import type { BaseSystemFields } from "./generated-types";
 
 export type ExportFilteredStoreParams = {
   collection: RecordService;
@@ -71,6 +71,8 @@ export function subscribeFilteredStore<
     }
   };
 
+  
+
   //Make sure the page number is correct (not outside range).
   //Checks the page number and results when either changes to allow
   //for external modification of page store (outside of this function)
@@ -79,6 +81,9 @@ export function subscribeFilteredStore<
   });
   pageStore.subscribe((newPage) => {
     const neededUpdating = makePageWithRange(newPage, get(resultStore));
+
+    //Update the query params. But make sure that if the previous function reset the page store
+    //the request isn't updated, this prevents unnecessary requests.
     if (!neededUpdating) {
       queryParamsStore.update((t) => ({ ...t, page: newPage }));
     }
@@ -88,7 +93,8 @@ export function subscribeFilteredStore<
   //This is done by updating a value (dateStore) that the derived store listens to.
   //Not the most efficient as this repeats the current request, but seems the simplest way.
   if (browser) {
-    collection.subscribe("*", () => {
+    const unsubscribe = collection.subscribe("*", () => {
+      console.log("New Subscribe Data", collection)
       const subscribeDate = new Date();
       dateStore.set(subscribeDate.getTime());
     });
