@@ -1,7 +1,6 @@
 import type { Record as PBRecord } from "pocketbase";
 import type { BaseSystemFields } from "../generated-types";
 import { subscribeList, type SubscribeListOuterType } from "./subscribeList";
-import { subscribePBList } from "./subscribePBList";
 import type { RecordListQueryParamsOriginal } from "./recordListQueryParamsStore";
 
 export const pocketbaseHelper = <
