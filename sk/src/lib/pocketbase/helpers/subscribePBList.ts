@@ -62,7 +62,6 @@ export const subscribePBList = <
         ...currentQueryParams,
       })
       .then((newData) => {
-        console.log("New Data", newData);
         if (newData.totalPages === 0 && newData.page !== 1) {
           paramsStore.update((v) => ({ ...v, page: 1 }));
           return;

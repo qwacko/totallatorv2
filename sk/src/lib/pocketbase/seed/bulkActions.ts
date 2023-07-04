@@ -7,7 +7,11 @@ import {
 } from "./accountCreation";
 
 export const getAndLogAccounts = async () => {
-  const data = await pbAccounts.accounts.getList({ perPage: 1000 });
+  const data = await pbAccounts.accounts.getList({
+    perPage: 1000,
+    filter: { title: "" },
+    sort: [],
+  });
   console.log("Account Data", data);
 };
 
@@ -46,7 +50,11 @@ export const generateAccounts = async ({
 };
 
 export const removeAccounts = async () => {
-  const accounts = await pbAccounts.accounts.getList({ perPage: 10000 });
+  const accounts = await pbAccounts.accounts.getList({
+    perPage: 10000,
+    filter: {},
+    sort: [],
+  });
   await Promise.all(
     accounts.items.map(async (currentAccount) => {
       await pbAccounts.accounts.delete(currentAccount.id);

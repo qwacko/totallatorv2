@@ -1,5 +1,5 @@
 import type { RecordService } from "pocketbase";
-import type {  BudgetsRecord,  BudgetsResponse } from "../generated-types";
+import type { BudgetsRecord, BudgetsResponse } from "../generated-types";
 import { pocketbaseHelper } from "../helpers/pocketbaseHelper";
 
 export type BudgetFilterType = {
@@ -32,10 +32,17 @@ export const budgetSort = (sort: BudgetSortType) => {
 };
 
 export const budgets = (collection: RecordService) =>
-  pocketbaseHelper<BudgetsResponse, BudgetFilterType, BudgetSortType, BudgetsRecord>({
+  pocketbaseHelper<
+    BudgetsResponse,
+    BudgetFilterType,
+    BudgetSortType,
+    BudgetsRecord
+  >({
     collection,
     filterToText: budgetFilter,
     sortToText: budgetSort,
-    defaultFilter: { title: "" },
-    defaultSort: [{ key: "title", dir: "asc" }],
+    defaultQueryParams: {
+      filter: { title: "" },
+      sort: [{ key: "title", dir: "asc" }],
+    },
   });

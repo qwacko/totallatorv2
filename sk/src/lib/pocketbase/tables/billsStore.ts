@@ -36,6 +36,8 @@ export const bills = (collection: RecordService) =>
     collection,
     filterToText: billFilter,
     sortToText: billSort,
-    defaultFilter: { title: "" },
-    defaultSort: [{ key: "title", dir: "asc" }],
+    defaultQueryParams: {
+      filter: { title: "" },
+      sort: [{ key: "title", dir: "asc" }],
+    },
   });

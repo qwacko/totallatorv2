@@ -1,8 +1,5 @@
 import type { RecordService } from "pocketbase";
-import type {
-  TagsRecord,
-  TagsResponse,
-} from "../generated-types";
+import type { TagsRecord, TagsResponse } from "../generated-types";
 import { pocketbaseHelper } from "../helpers/pocketbaseHelper";
 
 export type TagFilterType = {
@@ -15,10 +12,10 @@ export const tagFilter = (filter: TagFilterType) => {
   if (filter.title) {
     filterArray.push(`title ~ '${filter.title}'`);
   }
-  if(filter.group){
-    filterArray.push(`group ~ ${filter.group}`)
+  if (filter.group) {
+    filterArray.push(`group ~ ${filter.group}`);
   }
-  
+
   return filterArray.join(" && ");
 };
 
@@ -39,16 +36,12 @@ export const tagSort = (sort: TagSortType) => {
 };
 
 export const tags = (collection: RecordService) =>
-  pocketbaseHelper<
-    TagsResponse,
-    TagFilterType,
-    TagSortType,
-    TagsRecord
-  >({
+  pocketbaseHelper<TagsResponse, TagFilterType, TagSortType, TagsRecord>({
     collection,
     filterToText: tagFilter,
     sortToText: tagSort,
-    defaultFilter: { title: "" },
-    defaultSort: [{ key: "title", dir: "asc" }],
+    defaultQueryParams: {
+      filter: { title: "" },
+      sort: [{ key: "title", dir: "asc" }],
+    },
   });
-

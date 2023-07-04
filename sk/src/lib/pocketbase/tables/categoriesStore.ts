@@ -45,6 +45,8 @@ export const categories = (collection: RecordService) =>
     collection,
     filterToText: categoryFilter,
     sortToText: categorySort,
-    defaultFilter: { title: "" },
-    defaultSort: [{ key: "title", dir: "asc" }],
+    defaultQueryParams: {
+      filter: { title: "" },
+      sort: [{ key: "title", dir: "asc" }],
+    },
   });

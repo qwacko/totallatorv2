@@ -12,27 +12,33 @@ export const pocketbaseHelper = <
   collection,
   filterToText,
   sortToText,
-  defaultQueryParams
+  defaultQueryParams,
 }: SubscribeListOuterType<FilterType, SortType>) => {
   return {
     subscribeList: subscribeList<ResponseType, FilterType, SortType>({
       collection,
       filterToText,
       sortToText,
-      defaultQueryParams
+      defaultQueryParams,
     }),
     add: async (newItem: RecordType) =>
       collection.create<RecordType>(newItem as {}, { $autoCancel: false }),
     update: async ({ id, data }: { id: string; data: Partial<RecordType> }) =>
       collection.update<RecordType>(id, data, { $autoCancel: false }),
     delete: async (id: string) => collection.delete(id, { $autoCancel: false }),
-    getList: async (params: RecordListQueryParamsOriginal<FilterType,SortType>) => {
-      const paramsModified = {...defaultQueryParams, ...params}
-      const data = await collection.getList<ResponseType>(paramsModified.page, paramsModified.perPage, {
-        filter: filterToText(paramsModified.filter),
-        sort: sortToText(paramsModified.sort),
-        $autoCancel: false,
-      });
+    getList: async (
+      params: RecordListQueryParamsOriginal<FilterType, SortType>
+    ) => {
+      const paramsModified = { ...defaultQueryParams, ...params };
+      const data = await collection.getList<ResponseType>(
+        paramsModified.page,
+        paramsModified.perPage,
+        {
+          filter: filterToText(paramsModified.filter),
+          sort: sortToText(paramsModified.sort),
+          $autoCancel: false,
+        }
+      );
       return data;
     },
     getItem: async (id: string) => collection.getOne<ResponseType>(id),

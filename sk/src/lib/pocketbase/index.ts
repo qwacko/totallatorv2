@@ -26,7 +26,7 @@ export async function login(
     const user = { ...rest, username, password, confirmPassword: password };
     await client.collection("users").create(user);
   }
-  await client.collection("users").authWithPassword(username, password)
+  await client.collection("users").authWithPassword(username, password);
 }
 
 export function logout() {
@@ -76,7 +76,9 @@ export interface PageStore<T extends Record<any, any>>
 }
 
 // realtime subscription on a collection, with pagination
-export function watch<T extends Record<string, any> & BaseSystemFields<unknown>>(
+export function watch<
+  T extends Record<string, any> & BaseSystemFields<unknown>
+>(
   idOrName: Collections,
   queryParams = {} as any,
   page = 1,
@@ -92,31 +94,30 @@ export function watch<T extends Record<string, any> & BaseSystemFields<unknown>>
       .getList<T>(page, perPage, queryParams)
       .then((r) => set((result = r)));
     // watch for changes (only if you're in the browser)
-    if (browser)
-      console.log("Browser Subscribing")
-      collection.subscribe<T>("*", ({ action, record }) => {
-        (async function (action: string) {
-          // see https://github.com/pocketbase/pocketbase/discussions/505
-          async function expand(expand: any, record: any) {
-            return expand
-              ? await collection.getOne(record.id, { expand })
-              : record;
-          }
-          switch (action) {
-            case "update":
-              record = await expand(queryParams.expand, record);
-              return result.items.map((item) =>
-                item.id === record.id ? record : item
-              );
-            case "create":
-              record = await expand(queryParams.expand, record);
-              return [...result.items, record];
-            case "delete":
-              return result.items.filter((item) => item.id !== record.id);
-          }
-          return result.items;
-        })(action).then((items) => set((result = { ...result, items })));
-      });
+    if (browser) console.log("Browser Subscribing");
+    collection.subscribe<T>("*", ({ action, record }) => {
+      (async function (action: string) {
+        // see https://github.com/pocketbase/pocketbase/discussions/505
+        async function expand(expand: any, record: any) {
+          return expand
+            ? await collection.getOne(record.id, { expand })
+            : record;
+        }
+        switch (action) {
+          case "update":
+            record = await expand(queryParams.expand, record);
+            return result.items.map((item) =>
+              item.id === record.id ? record : item
+            );
+          case "create":
+            record = await expand(queryParams.expand, record);
+            return [...result.items, record];
+          case "delete":
+            return result.items.filter((item) => item.id !== record.id);
+        }
+        return result.items;
+      })(action).then((items) => set((result = { ...result, items })));
+    });
   });
   async function setPage(newpage: number) {
     const { page, totalPages, perPage } = result;

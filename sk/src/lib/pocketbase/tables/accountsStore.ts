@@ -51,7 +51,8 @@ export const accounts = (collection: RecordService) =>
     collection,
     filterToText: accountFilter,
     sortToText: accountSort,
-    defaultFilter: { title: "" },
-    defaultSort: [{ key: "title", dir: "asc" }],
+    defaultQueryParams: {
+      filter: { title: "" },
+      sort: [{ key: "title", dir: "asc" }],
+    },
   });
-

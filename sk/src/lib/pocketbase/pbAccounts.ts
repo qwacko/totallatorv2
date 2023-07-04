@@ -8,10 +8,10 @@ import { budgets } from "./tables/budgetsStore";
 import { transactions } from "./tables/transactionsStore";
 
 export const pbAccounts = {
-    transactions: transactions(client.collection(Collections.Transactions)),
-    accounts: accounts(client.collection(Collections.Accounts)),
-    tags: tags(client.collection(Collections.Tags)),
-    categories: categories(client.collection(Collections.Categories)),
-    bills: bills(client.collection(Collections.Bills)),
-    budgets: budgets(client.collection(Collections.Budgets))
-}
+  transactions: transactions(client.collection(Collections.Transactions)),
+  accounts: accounts(client.collection(Collections.Accounts)),
+  tags: tags(client.collection(Collections.Tags)),
+  categories: categories(client.collection(Collections.Categories)),
+  bills: bills(client.collection(Collections.Bills)),
+  budgets: budgets(client.collection(Collections.Budgets)),
+};

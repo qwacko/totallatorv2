@@ -1,6 +1,10 @@
 import { AccountsTypeOptions } from "$lib/pocketbase/generated-types";
 import { pbAccounts } from "$lib/pocketbase/pbAccounts";
-import { getRandomArrayElement, getRandomInteger, getRandomBoolean } from "./getRandom";
+import {
+  getRandomArrayElement,
+  getRandomInteger,
+  getRandomBoolean,
+} from "./getRandom";
 
 const assetTitleParts = [
   "Bank",

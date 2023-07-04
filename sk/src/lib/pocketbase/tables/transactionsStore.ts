@@ -14,7 +14,7 @@ export const transactionFilter = (filter: TransactionFilterType) => {
   if (filter.description) {
     filterArray.push(`description ~ '${filter.description}'`);
   }
-  
+
   return filterArray.join(" && ");
 };
 
@@ -44,7 +44,8 @@ export const transactions = (collection: RecordService) =>
     collection,
     filterToText: transactionFilter,
     sortToText: transactionSort,
-    defaultFilter: { description: "" },
-    defaultSort: [{ key: "date", dir: "desc" }],
+    defaultQueryParams: {
+      filter: { description: "" },
+      sort: [{ key: "date", dir: "desc" }],
+    },
   });
-

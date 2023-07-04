@@ -2,7 +2,10 @@ import type { RecordListQueryParams, RecordService } from "pocketbase";
 import type { BaseSystemFields } from "../generated-types";
 
 import { subscribePBList } from "./subscribePBList";
-import type { RecordListQueryParamsOriginal, RecordListQueryParamsStoreParameters } from "./recordListQueryParamsStore";
+import type {
+  RecordListQueryParamsOriginal,
+  RecordListQueryParamsStoreParameters,
+} from "./recordListQueryParamsStore";
 
 export type ExportFilteredStoreParams = {
   collection: RecordService;
@@ -16,7 +19,7 @@ export type SubscribeListInnerParams<
   ExportFilteredStoreParams,
   "initialQueryParams" | "idOrName" | "collection"
 > & {
-  initialQueryParams?: RecordListQueryParamsOriginal<FilterType,SortType>;
+  initialQueryParams?: RecordListQueryParamsOriginal<FilterType, SortType>;
 };
 
 export type SubscribeListOuterType<
@@ -26,7 +29,7 @@ export type SubscribeListOuterType<
   collection: RecordService;
   filterToText: (data: FilterType) => string;
   sortToText: (data: SortType) => string;
-  defaultQueryParams: RecordListQueryParamsOriginal<FilterType, SortType>
+  defaultQueryParams: RecordListQueryParamsOriginal<FilterType, SortType>;
 };
 
 export const subscribeList = <
@@ -37,7 +40,7 @@ export const subscribeList = <
   collection,
   filterToText,
   sortToText,
-  defaultQueryParams
+  defaultQueryParams,
 }: SubscribeListOuterType<FilterType, SortType>) => {
   return ({
     initialQueryParams,
@@ -46,8 +49,7 @@ export const subscribeList = <
       collection,
       filterToText,
       sortToText,
-      initialParams: {...defaultQueryParams, ...initialQueryParams}
+      initialParams: { ...defaultQueryParams, ...initialQueryParams },
     });
   };
 };
-

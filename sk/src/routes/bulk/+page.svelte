@@ -4,7 +4,7 @@
     generateAccounts,
     getAndLogAccounts,
     removeAccounts,
-  } from "./bulkActions";
+  } from "$lib/pocketbase/seed/bulkActions";
 
   $metadata.title = "Bulk Actions";
 
