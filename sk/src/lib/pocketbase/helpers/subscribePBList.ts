@@ -8,7 +8,7 @@ import { browser } from "$app/environment";
 import type { BaseSystemFields } from "../generated-types";
 
 export const subscribePBList = <
-ReturnType extends Record<string,any> & BaseSystemFields<unknown>,
+  ReturnType extends Record<string, any> & BaseSystemFields<unknown>,
   FilterType extends Record<string, any>,
   SortType extends Array<Record<string, any>>
 >({
@@ -47,21 +47,33 @@ ReturnType extends Record<string,any> & BaseSystemFields<unknown>,
     return () => {};
   });
 
-  const resultStore = derived<[typeof transformedParamsStore, typeof subscriptionStore], ListResult<ReturnType>>([transformedParamsStore, subscriptionStore], (stores, set) => {
-    const [currentQueryParams] = stores
+  const resultStore = derived<
+    [typeof transformedParamsStore, typeof subscriptionStore],
+    ListResult<ReturnType>
+  >([transformedParamsStore, subscriptionStore], (stores, set) => {
+    const [currentQueryParams] = stores;
 
-    const page = currentQueryParams.page || 0
-    const perPage = currentQueryParams.perPage || 20
+    const page = currentQueryParams.page || 0;
+    const perPage = currentQueryParams.perPage || 20;
 
-    collection.getList<ReturnType>(page, perPage, {$autoCancel: false, ...currentQueryParams}).then(newData => {
-        if(newData.page > newData.totalPages){
-            paramsStore.update(v => ({...v, page: newData.totalPages}))
-            return
+    collection
+      .getList<ReturnType>(page, perPage, {
+        $autoCancel: false,
+        ...currentQueryParams,
+      })
+      .then((newData) => {
+        console.log("New Data", newData);
+        if (newData.totalPages === 0 && newData.page !== 1) {
+          paramsStore.update((v) => ({ ...v, page: 1 }));
+          return;
         }
-        set(newData)
-    })
+        if (newData.page > newData.totalPages && newData.totalPages > 0) {
+          paramsStore.update((v) => ({ ...v, page: newData.totalPages }));
+          return;
+        }
+        set(newData);
+      });
+  });
 
-  })
-
-  return {paramsStore, resultStore}
+  return { paramsStore, resultStore };
 };
