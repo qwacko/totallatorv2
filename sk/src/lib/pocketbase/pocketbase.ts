@@ -4,14 +4,12 @@ import type {
   RecordListQueryParams,
   RecordService,
 } from "pocketbase";
-import { writable, derived, get } from "svelte/store";
+import { writable, derived, get, readable } from "svelte/store";
 import type { BaseSystemFields } from "./generated-types";
 
 export type ExportFilteredStoreParams = {
   collection: RecordService;
   initialQueryParams?: RecordListQueryParams;
-  initialPage?: number;
-  initialPerPage?: number;
 };
 
 // realtime subscription on a collection, with pagination
@@ -20,26 +18,51 @@ export function subscribeFilteredStore<
 >({
   collection,
   initialQueryParams,
-  initialPage = 1,
-  initialPerPage = 20,
 }: ExportFilteredStoreParams) {
   const date = new Date();
-  const dateStore = writable(date.getTime());
-  const pageStore = writable<number>(initialPage);
-  const perPageStore = writable<number>(initialPerPage);
   const queryParamsStore = writable(initialQueryParams);
+  
+  const autoTriggerStore = readable(date, (set) => {
+    if (browser) {
+      const triggerUnsubscribe = collection.subscribe("*", () => {
+        const subscribeDate = new Date();
+        set(subscribeDate);
+      });
+
+      const triggerUnsubscribeRemapped = triggerUnsubscribe;
+
+      const unsubFunction = () => {
+        const asynbUnsubFunction = async () => {
+          await (
+            await triggerUnsubscribeRemapped
+          )();
+        };
+        asynbUnsubFunction();
+      };
+
+      return unsubFunction;
+    }
+
+    return () => {};
+  });
   const triggerStores = [
     queryParamsStore,
-    pageStore,
-    perPageStore,
-    dateStore,
-  ] satisfies [any, any, any, any];
+    autoTriggerStore,
+  ] satisfies [any,  any];
   const resultStore = derived<typeof triggerStores, ListResult<T>>(
-    triggerStores,
+    [queryParamsStore, autoTriggerStore],
     (stores, set) => {
-      const [currentQueryParams, currentPage, currentPerPage] = stores;
+      const [currentQueryParams] = stores;
+
+      const currentPage = currentQueryParams.page || 0
+      const neededUpdating = makePageWithRange(currentPage, get(resultStore));
+
+      if (neededUpdating) {
+        return;
+      }
+
       collection
-        .getList<T>(currentPage, currentPerPage, {
+        .getList<T>(currentPage, currentQueryParams.perPage || 20, {
           $autoCancel: false,
           ...currentQueryParams,
         })
@@ -58,12 +81,12 @@ export function subscribeFilteredStore<
       const maxPage = results.totalPages;
 
       if (page > maxPage) {
-        pageStore.set(maxPage);
+        queryParamsStore.update((v) => ({...v, page: maxPage}))
         return true;
       }
 
       if (page < minPage) {
-        pageStore.set(minPage);
+        queryParamsStore.update((v) => ({...v, page: minPage}))
         return true;
       }
 
@@ -71,55 +94,25 @@ export function subscribeFilteredStore<
     }
   };
 
-  
-
-  //Make sure the page number is correct (not outside range).
-  //Checks the page number and results when either changes to allow
-  //for external modification of page store (outside of this function)
-  resultStore.subscribe((newResults) => {
-    makePageWithRange(get(pageStore), newResults);
-  });
-  pageStore.subscribe((newPage) => {
-    const neededUpdating = makePageWithRange(newPage, get(resultStore));
-
-    //Update the query params. But make sure that if the previous function reset the page store
-    //the request isn't updated, this prevents unnecessary requests.
-    if (!neededUpdating) {
-      queryParamsStore.update((t) => ({ ...t, page: newPage }));
-    }
-  });
-
-  //Automatically Triggers Update On Change in underlying dataset.
-  //This is done by updating a value (dateStore) that the derived store listens to.
-  //Not the most efficient as this repeats the current request, but seems the simplest way.
-  if (browser) {
-    const unsubscribe = collection.subscribe("*", () => {
-      console.log("New Subscribe Data", collection)
-      const subscribeDate = new Date();
-      dateStore.set(subscribeDate.getTime());
-    });
-  }
 
   async function setPage(newPage: number) {
     const minPage = 1;
     const maxPage = get(resultStore).totalPages;
 
-    if (newPage <= maxPage && newPage >= minPage) {
-      pageStore.set(newPage);
+    if (newPage <= maxPage && newPage >= minPage) {      
+      queryParamsStore.update((v) => ({...v, page: newPage}))
     }
   }
 
   return {
     ...resultStore,
-    perPageStore,
     queryParamsStore,
-    pageStore,
     setPage,
     async next() {
-      setPage(get(pageStore) + 1);
+      setPage((get(queryParamsStore).page || 0) + 1);
     },
     async prev() {
-      setPage(get(pageStore) - 1);
+      setPage((get(queryParamsStore).page || 0) - 1);
     },
   };
 }

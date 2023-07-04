@@ -5,6 +5,7 @@
   const links = [
     ["Home", "/"],
     ["Accounts", "/accounts/"],
+    ["Bulk","/bulk/"]
   ].map(([text, href]) => [
     text,
     href

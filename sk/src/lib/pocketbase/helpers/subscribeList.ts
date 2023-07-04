@@ -15,6 +15,7 @@ export type SubscribeListInnerParams<
 > & {
   initialFilter?: FilterType;
   initialSort?: SortType;
+  initialQueryParams?: Omit<RecordListQueryParams,"filter"|"sort">
 };
 
 export type SubscribeListOuterType<
@@ -46,16 +47,15 @@ export const subscribeList = <
   return ({
     initialFilter,
     initialSort,
-    initialPage,
-    initialPerPage,
+    initialQueryParams
   }: SubscribeListInnerParams<FilterType, SortType>) => {
     //Initialise the query.
-    console.log("Running Inner Subscribe List")
     const initalFilterString = filterToText(initialFilter || defaultFilter);
     const initialSortString = sortToText(initialSort || defaultSort);
-    const initialQueryParams: RecordListQueryParams = {
-      page: initialPage || defaultPage,
-      perPage: initialPerPage || defaultPerPage,
+    const initialQueryParamsInternal: RecordListQueryParams = {
+      ...initialQueryParams,
+      page: initialQueryParams?.page || defaultPage,
+      perPage: initialQueryParams?.perPage || defaultPerPage,
       filter: initalFilterString,
       sort: initialSortString,
     };
@@ -66,14 +66,11 @@ export const subscribeList = <
 
     const listStore = subscribeFilteredStore<ResponseType>({
       collection,
-      initialQueryParams,
-      initialPage,
-      initialPerPage,
+      initialQueryParams: initialQueryParamsInternal
     });
 
     //Generate Function to Update Query based on filtering and sorting
     const updateQueryParams = () => {
-      console.log("Updating Query Parameters")
       listStore.queryParamsStore.update((currentQueryParams) => ({
         ...currentQueryParams,
         filter: filterToText(get(filterStore)),

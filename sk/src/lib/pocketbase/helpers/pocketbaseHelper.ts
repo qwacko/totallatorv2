@@ -27,15 +27,28 @@ export const pocketbaseHelper = <
       defaultPerPage,
     }),
     add: async (newItem: RecordType) =>
-      collection.create<RecordType>(newItem as {}),
+      collection.create<RecordType>(newItem as {}, { $autoCancel: false }),
     update: async ({ id, data }: { id: string; data: Partial<RecordType> }) =>
-      collection.update<RecordType>(id, data),
-    delete: async (id: string) => collection.delete(id),
-    getList: async ({filter = defaultFilter, sort = defaultSort, page = 1, perPage = 20} : {filter?: FilterType, sort?: SortType, page?: number, perPage?: number} = {}) => {
-      const data = await collection.getList(page,perPage, {filter: filterToText(filter), sort: sortToText(sort)})
-      return data
-    }, 
-    getItem: async (id: string) => collection.getOne(id)
+      collection.update<RecordType>(id, data, { $autoCancel: false }),
+    delete: async (id: string) => collection.delete(id, { $autoCancel: false }),
+    getList: async ({
+      filter = defaultFilter,
+      sort = defaultSort,
+      page = 1,
+      perPage = 20,
+    }: {
+      filter?: FilterType;
+      sort?: SortType;
+      page?: number;
+      perPage?: number;
+    } = {}) => {
+      const data = await collection.getList<ResponseType>(page, perPage, {
+        filter: filterToText(filter),
+        sort: sortToText(sort),
+        $autoCancel: false,
+      });
+      return data;
+    },
+    getItem: async (id: string) => collection.getOne<ResponseType>(id),
   };
 };
-

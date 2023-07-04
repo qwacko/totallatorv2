@@ -6,7 +6,6 @@
 
   const { filterStore, ...accountsStore } =
     pbAccounts.accounts.subscribeList({
-      initialPerPage: 5,
       initialFilter: { title: "" },
       initialSort: [{ key: "title", dir: "asc" }],
     });
@@ -17,6 +16,7 @@
   <table>
     {#each $accountsStore.items as currentAccount}
       <tr>
+        <td><button class="border border-gray-600 px-2 py-1 rounded-md bg-gray-200" on:click={() => pbAccounts.accounts.delete(currentAccount.id)}>x</button></td>
         <td>{currentAccount.title}</td>
       </tr>
     {/each}
