@@ -1,16 +1,21 @@
+import { client } from "..";
 import type { TransactionsRecord } from "../generated-types";
 
 export const bulkDeleteAllTransactions = async () => {
   const returnData: { error?: string; response?: string } = {};
   try {
-    const response = await fetch("/api/custom/deleteAllTransactions", {
+    const response2 = await client.send("/api/custom/deleteAllTransactions", {
       method: "POST",
       body: JSON.stringify({}),
-      headers: {
-        "Content-Type": "application/json",
-      },
     });
-    returnData.response = await response.text();
+    // const response = await fetch("/api/custom/deleteAllTransactions", {
+    //   method: "POST",
+    //   body: JSON.stringify({}),
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // });
+    returnData.response = await response2.text();
   } catch (e) {
     console.log("Error Deleting Transaction", e);
     returnData.error = "Error Deleting All Transactions";
@@ -21,7 +26,7 @@ export const bulkDeleteAllTransactions = async () => {
 export const bulkCreateTransactions = async (data: TransactionsRecord[]) => {
   const returnData: { error?: string; response?: string } = {};
   try {
-    const response = await fetch("/api/custom/addBulk", {
+    const response = await client.send("/api/custom/addBulk", {
       method: "POST",
       body: JSON.stringify({
         data,
@@ -43,7 +48,7 @@ export const bulkCreateTransactions = async (data: TransactionsRecord[]) => {
 export const bulkDeleteTransactions = async (data: string[]) => {
   const returnData: { error?: string; response?: string } = {};
   try {
-    const response = await fetch("/api/custom/deleteBulkTransactions", {
+    const response = await client.send("/api/custom/deleteBulkTransactions", {
       method: "POST",
       body: JSON.stringify({
         data,
