@@ -5,11 +5,13 @@
   const links = [
     ["Home", "/"],
     ["Accounts", "/accounts/"],
-    ["Bulk","/bulk/"]
-  ].map(([text, href]) => [
-    text,
-    href
-  ]);
+    ["Tags", "/tags/"],
+    ["Categories", "/categories/"],
+    ["Bills", "/bills/"],
+    ["Budgets", "/budgets/"],
+    ["Bulk", "/bulk/"],
+    ["Test", "/test/"],
+  ].map(([text, href]) => [text, href]);
 </script>
 
 <nav>

@@ -26,13 +26,12 @@
 </svelte:head>
 
 <header>
-
   <Nav />
   <Login />
 </header>
 <main>
   {#if headline}
-    <h1>{headline}</h1>
+    <h1 class="text-lg font-bold py-4 text-center w-full">{headline}</h1>
   {/if}
   <Alerts />
   <slot />
@@ -46,6 +45,5 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
   }
 </style>

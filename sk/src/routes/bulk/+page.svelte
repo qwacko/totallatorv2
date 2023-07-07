@@ -4,43 +4,92 @@
     generateAccounts,
     getAndLogAccounts,
     removeAccounts,
-  } from "$lib/pocketbase/seed/bulkActions";
+  } from "$lib/pocketbase/seed/bulkAccountActions";
+  import {
+    generateBills,
+    removeBills,
+  } from "$lib/pocketbase/seed/bulkBillActions";
+  import {
+    generateBudgets,
+    removeBudgets,
+  } from "$lib/pocketbase/seed/bulkBudgetActions";
+  import {
+    generateCategories,
+    removeCategories,
+  } from "$lib/pocketbase/seed/bulkCategoryActions";
+  import {
+    createTag,
+    generateTags,
+    removeTags,
+  } from "$lib/pocketbase/seed/bulkTagActions";
+  import BulkButton from "./BulkButton.svelte";
+  import {
+    generateTransactions,
+    removeAllTransaction,
+    removeTransactions,
+  } from "$lib/pocketbase/seed/bulkTransactionActions";
 
   $metadata.title = "Bulk Actions";
-
-  let loading = false;
-
-  const functionWithLoading = (action: () => Promise<void>) => {
-    const actionInternal = async () => {
-      loading = true;
-      await action();
-      loading = false;
-    };
-    actionInternal();
-  };
 </script>
 
-{loading ? "Loading" : "Not Loading"}
-
-{#if loading}
-  <div class="bg-red p-2">Loading...</div>
-{:else}
-  <div class="flex flex-col gap-2 px-2">
-    <button class="flex" on:click={() => functionWithLoading(getAndLogAccounts)}>Log Account</button>
-    <button
-      class="flex bg-gray-100 border border-gray-500 p-1 rounded-sm hover:bg-gray-500"
-      on:click={() =>
-        functionWithLoading(async () => {
-          await generateAccounts({
-            countAssets: 30,
-            countLiabilities: 10,
-            countExpenses: 200,
-            countIncome: 20,
-          });
-        })}>Create Accounts</button
+<div class="flex flex-col gap-2 px-2">
+  <h1 class="flex font-bold">Accounts</h1>
+  <div class="flex flex-row gap-2">
+    <BulkButton
+      clickFunction={async () => {
+        await generateAccounts({
+          countAssets: 30,
+          countLiabilities: 10,
+          countExpenses: 200,
+          countIncome: 20,
+        });
+      }}
     >
-    <button class="flex" on:click={() => functionWithLoading(removeAccounts)}
-      >Remove Accounts</button
-    >
+      Create Accounts
+    </BulkButton>
+    <BulkButton clickFunction={removeAccounts}>Remove Accounts</BulkButton>
   </div>
-{/if}
+  <h1 class="flex font-bold">Tags</h1>
+  <div class="flex flex-row gap-2">
+    <BulkButton clickFunction={async () => generateTags(8)}>
+      Create Tags
+    </BulkButton>
+    <BulkButton clickFunction={removeTags}>Remove Tags</BulkButton>
+  </div>
+  <h1 class="flex font-bold">Categories</h1>
+  <div class="flex flex-row gap-2">
+    <BulkButton clickFunction={async () => generateCategories(100)}>
+      Create Categories
+    </BulkButton>
+    <BulkButton clickFunction={removeCategories}>Remove Categories</BulkButton>
+  </div>
+  <h1 class="flex font-bold">Bills</h1>
+  <div class="flex flex-row gap-2">
+    <BulkButton clickFunction={async () => generateBills(25)}>
+      Create Bills
+    </BulkButton>
+    <BulkButton clickFunction={removeBills}>Remove Bills</BulkButton>
+  </div>
+  <h1 class="flex font-bold">Budgets</h1>
+  <div class="flex flex-row gap-2">
+    <BulkButton clickFunction={async () => generateBudgets(25)}>
+      Create Budgets
+    </BulkButton>
+    <BulkButton clickFunction={removeBudgets}>Remove Budgets</BulkButton>
+  </div>
+  <h1 class="flex font-bold">Transactions</h1>
+  <div class="flex flex-row gap-2">
+    <BulkButton
+      clickFunction={async () =>
+        generateTransactions({ transferCount: 500, incExpCount: 1500 })}
+    >
+      Create Transactions
+    </BulkButton>
+    <BulkButton clickFunction={removeTransactions}>
+      Remove Transactions
+    </BulkButton>
+    <BulkButton clickFunction={removeAllTransaction}>
+      Remove All Transactions
+    </BulkButton>
+  </div>
+</div>

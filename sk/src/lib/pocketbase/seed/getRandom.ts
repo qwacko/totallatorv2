@@ -1,4 +1,4 @@
-export const getRandomArrayElement = (targetArray: string[]) => {
+export const getRandomArrayElement = <T>(targetArray: T[]) => {
   return targetArray[Math.floor(Math.random() * targetArray.length)];
 };
 export const getRandomBoolean = (threshold: number = 0.5) =>

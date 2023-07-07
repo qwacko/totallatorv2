@@ -7,12 +7,22 @@ import { pocketbaseHelper } from "../helpers/pocketbaseHelper";
 
 export type TransactionFilterType = {
   description?: string | undefined;
+  date?: {
+    gt?: Date;
+    lt?: Date;
+  };
 };
 
 export const transactionFilter = (filter: TransactionFilterType) => {
   let filterArray: string[] = [];
   if (filter.description) {
     filterArray.push(`description ~ '${filter.description}'`);
+  }
+  if (filter.date && filter.date.gt) {
+    filterArray.push(`date >= ${filter.date.gt.toISOString()}`);
+  }
+  if (filter.date && filter.date.lt) {
+    filterArray.push(`date <= ${filter.date.lt.toISOString()}`);
   }
 
   return filterArray.join(" && ");
