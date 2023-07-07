@@ -21,6 +21,15 @@ import (
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 )
 
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
+
 func defaultPublicDir() string {
 	if strings.HasPrefix(os.Args[0], os.TempDir()) {
 		// most likely ran with go run
@@ -28,6 +37,31 @@ func defaultPublicDir() string {
 	}
 
 	return filepath.Join(os.Args[0], "../pb_public")
+}
+
+// Determines whether a user can access this endpoint by confirming someone is logged in
+// and also that the logged in user has the "admin" role.
+func adminRoleRequired(app core.App) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			authRecord, _ := c.Get(apis.ContextAuthRecordKey).(*models.Record)
+			if authRecord == nil {
+				log.Print("Auth Record Error : ", authRecord)
+				return apis.NewForbiddenError("Only Authenticated Users Can Access This Endpoint", "")
+			}
+
+			roles := authRecord.GetStringSlice("role")
+
+			isAdmin := contains(roles, "admin")
+
+			if !isAdmin {
+				return apis.NewForbiddenError("Only Admins Can Access This Endpoint", "")
+			}
+
+			return next(c)
+
+		}
+	}
 }
 
 func main() {
@@ -68,14 +102,19 @@ func main() {
 			Path:   "/api/custom/deleteAllTransactions",
 			Middlewares: []echo.MiddlewareFunc{
 				apis.ActivityLogger(app),
-				apis.LoadAuthContext(app),
+				adminRoleRequired(app),
 			},
 			Handler: func(c echo.Context) (err error) {
+
 				records, err := app.Dao().FindRecordsByExpr("transactions", dbx.NewExp("true"))
+
 				if err != nil {
+					log.Print("Record Finding Error : ", err)
 					return err
 				}
+
 				txError := app.Dao().RunInTransaction(func(txDao *daos.Dao) error {
+
 					for _, record := range records {
 						txDao.DeleteRecord(record)
 					}
@@ -94,7 +133,7 @@ func main() {
 			Path:   "/api/custom/deleteBulkTransactions",
 			Middlewares: []echo.MiddlewareFunc{
 				apis.ActivityLogger(app),
-				apis.LoadAuthContext(app),
+				adminRoleRequired(app),
 			},
 			Handler: func(c echo.Context) (err error) {
 				u := new(BulkDelete)
@@ -128,7 +167,7 @@ func main() {
 			Path:   "/api/custom/addBulk",
 			Middlewares: []echo.MiddlewareFunc{
 				apis.ActivityLogger(app),
-				apis.LoadAuthContext(app),
+				adminRoleRequired(app),
 			},
 			Handler: func(c echo.Context) (err error) {
 				u := new(TestBulkData)
@@ -205,6 +244,10 @@ func main() {
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+type UserModel struct {
+	ID string `json:"id"`
 }
 
 type BulkTransactionSingle struct {
