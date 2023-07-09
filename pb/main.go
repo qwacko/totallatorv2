@@ -19,6 +19,7 @@ import (
 	"github.com/pocketbase/pocketbase/models"
 	"github.com/pocketbase/pocketbase/plugins/jsvm"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
+	"github.com/pocketbase/pocketbase/tools/hook"
 )
 
 func contains(s []string, str string) bool {
@@ -92,6 +93,53 @@ func main() {
 
 	// call this only if you want to use the configurable "hooks" functionality
 	// hooks.PocketBaseInit(app)
+
+	// When Creating a Transaction, this will also create the related journals.
+	app.OnRecordBeforeCreateRequest("transactions").Add(func(e *core.RecordCreateEvent) error {
+
+		collection, err := app.Dao().FindCollectionByNameOrId("journals")
+		if err != nil {
+			return hook.StopPropagation
+		}
+
+		directions := [2]string{"from", "to"}
+
+		account := e.Record.GetString("toAccount")
+		fromAccount := e.Record.GetString("fromAccount")
+		amount := e.Record.GetFloat("amount")
+		transactionId := e.Record.GetId()
+
+		for _, direction := range directions {
+
+			record := models.NewRecord(collection)
+			form := forms.NewRecordUpsert(app, record)
+
+			var useAmount float64
+			var useAccount string
+			if direction == "from" {
+				useAccount = fromAccount
+				useAmount = amount * -1
+			} else {
+				useAmount = amount
+				useAccount = account
+			}
+
+			form.LoadData(map[string]any{
+				"account":     useAccount,
+				"amount":      useAmount,
+				"transaction": transactionId,
+				"direction":   direction,
+			})
+
+			if err := form.Submit(); err != nil {
+				return err
+			}
+
+		}
+
+		return nil
+
+	})
 
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		// serves static files from the provided public dir (if exists)

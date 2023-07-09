@@ -4,6 +4,7 @@
   import Login from "./Login.svelte";
   const links = [
     ["Home", "/"],
+    ["Transactions", "/transactions/"],
     ["Accounts", "/accounts/"],
     ["Tags", "/tags/"],
     ["Categories", "/categories/"],
