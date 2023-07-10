@@ -81,7 +81,7 @@
   <div class="flex flex-row gap-2">
     <BulkButton
       clickFunction={async () =>
-        generateTransactions({ transferCount: 5000, incExpCount: 15000 })}
+        generateTransactions({ transferCount: 5, incExpCount: 15 })}
     >
       Create Transactions
     </BulkButton>

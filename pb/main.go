@@ -91,11 +91,12 @@ func main() {
 		Automigrate:  true,
 	})
 
-	// call this only if you want to use the configurable "hooks" functionality
-	// hooks.PocketBaseInit(app)
+	// After Creating a Transaction, this will also create the related journals.
+	app.OnModelAfterCreate("transactions").Add(func(e *core.ModelEvent) error {
 
-	// When Creating a Transaction, this will also create the related journals.
-	app.OnRecordBeforeCreateRequest("transactions").Add(func(e *core.RecordCreateEvent) error {
+		log.Print("OnModelBeforeCreate - Transactions")
+
+		rec := e.Model.(*models.Record)
 
 		collection, err := app.Dao().FindCollectionByNameOrId("journals")
 		if err != nil {
@@ -104,10 +105,10 @@ func main() {
 
 		directions := [2]string{"from", "to"}
 
-		account := e.Record.GetString("toAccount")
-		fromAccount := e.Record.GetString("fromAccount")
-		amount := e.Record.GetFloat("amount")
-		transactionId := e.Record.GetId()
+		account := rec.GetString("toAccount")
+		fromAccount := rec.GetString("fromAccount")
+		amount := rec.GetFloat("amount")
+		transactionId := rec.GetId()
 
 		for _, direction := range directions {
 
@@ -224,6 +225,9 @@ func main() {
 					log.Print("Data Load Error : ", err)
 					return err
 				}
+
+				log.Print("Bulk Addition Function Executing")
+
 				txError := app.Dao().RunInTransaction(func(txDao *daos.Dao) error {
 					for _, transaction := range u.Data {
 
@@ -276,18 +280,18 @@ func main() {
 	})
 
 	//Update Combined Title for Tags and Categories
-	app.OnRecordBeforeCreateRequest("tags", "categories").Add(func(e *core.RecordCreateEvent) error {
-		e.Record.Set("combinedTitle", e.Record.GetString("group")+string('/')+e.Record.GetString("title"))
+	app.OnModelBeforeCreate("tags", "categories").Add(func(e *core.ModelEvent) error {
+		rec := e.Model.(*models.Record)
+		rec.Set("combinedTitle", rec.GetString("group")+string('/')+rec.GetString("title"))
 		return nil
 	})
 
 	//Update Combined Title for Tags and Categories
-	app.OnRecordBeforeUpdateRequest("tags", "categories").Add(func(e *core.RecordUpdateEvent) error {
-		e.Record.Set("combinedTitle", e.Record.GetString("group")+string('/')+e.Record.GetString("title"))
+	app.OnModelBeforeUpdate("tags", "categories").Add(func(e *core.ModelEvent) error {
+		rec := e.Model.(*models.Record)
+		rec.Set("combinedTitle", rec.GetString("group")+string('/')+rec.GetString("title"))
 		return nil
 	})
-
-	app.OnRecordAfterUpdateRequest()
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

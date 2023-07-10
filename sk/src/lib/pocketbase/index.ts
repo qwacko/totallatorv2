@@ -7,8 +7,9 @@ import {
   type Subscriber,
 } from "svelte/store";
 import type { BaseSystemFields, Collections } from "./generated-types";
+import { PUBLIC_PBURL } from "$env/static/public";
 
-export const client = new PocketBase("http://192.168.0.104:8090/");
+export const client = new PocketBase(PUBLIC_PBURL);
 
 client.authStore.onChange(function () {
   currentUser.set(client.authStore.model);
