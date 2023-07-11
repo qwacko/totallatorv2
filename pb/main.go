@@ -91,6 +91,38 @@ func main() {
 		Automigrate:  true,
 	})
 
+	// When updating a transaction record, this will also update the related journals with the correct amount and account.
+	// Note that this runs regardless of if the amount / account has changed to ensure that the related journals are always correct and
+	// subscribers to the journals collection will always be notified of the change.
+	app.OnModelAfterUpdate("transactions").Add(func(e *core.ModelEvent) error {
+
+		rec := e.Model.(*models.Record)
+
+		relatedJournalRecords, err := app.Dao().FindRecordsByExpr("journals", dbx.HashExp{"transaction": rec.GetId()})
+
+		if err != nil {
+			log.Print("Error Finding Related Journals : ", err)
+			return hook.StopPropagation
+		}
+
+		//Loop Through Related Journals and Update Amount
+		for _, relatedJournalRecord := range relatedJournalRecords {
+			if relatedJournalRecord.GetString("direction") == "from" {
+				relatedJournalRecord.Set("amount", rec.GetFloat("amount")*-1)
+				relatedJournalRecord.Set("account", rec.GetString("fromAccount"))
+			} else {
+				relatedJournalRecord.Set("amount", rec.GetFloat("amount"))
+				relatedJournalRecord.Set("account", rec.GetString("toAccount"))
+			}
+
+			if err := app.Dao().SaveRecord(relatedJournalRecord); err != nil {
+				return err
+			}
+
+		}
+		return nil
+	})
+
 	// After Creating a Transaction, this will also create the related journals.
 	app.OnModelAfterCreate("transactions").Add(func(e *core.ModelEvent) error {
 
