@@ -7,6 +7,7 @@ import { bills } from "./tables/billsStore";
 import { budgets } from "./tables/budgetsStore";
 import { transactions } from "./tables/transactionsStore";
 import { customEndpoints } from "./tables/customEndpoints";
+import { journals } from "./tables/journalsStore";
 
 export const pbAccounts = {
   transactions: transactions(client.collection(Collections.Transactions)),
@@ -15,5 +16,6 @@ export const pbAccounts = {
   categories: categories(client.collection(Collections.Categories)),
   bills: bills(client.collection(Collections.Bills)),
   budgets: budgets(client.collection(Collections.Budgets)),
+  journals: journals(client.collection(Collections.Journals)),
   customEndpoints,
 };

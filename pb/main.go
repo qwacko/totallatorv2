@@ -35,6 +35,7 @@ func defaultPublicDir() string {
 }
 
 func main() {
+
 	app := pocketbase.New()
 
 	var publicDirFlag string
@@ -73,6 +74,9 @@ func main() {
 	})
 
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+
+		log.Print("Starting Server")
+
 		// serves static files from the provided public dir (if exists)
 		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS(publicDirFlag), true))
 

@@ -21,9 +21,15 @@ func CreateAction(e *core.ModelEvent, app *pocketbase.PocketBase) error {
 
 	directions := [2]string{"from", "to"}
 
-	account := rec.GetString("toAccount")
+	toAccount := rec.GetString("toAccount")
 	fromAccount := rec.GetString("fromAccount")
 	amount := rec.GetFloat("amount")
+	bill := rec.GetString("bill")
+	budget := rec.GetString("budget")
+	category := rec.GetString("category")
+	tag := rec.GetString("tag")
+	date := rec.GetString("date")
+	description := rec.GetString("description")
 	transactionId := rec.GetId()
 
 	for _, direction := range directions {
@@ -33,19 +39,29 @@ func CreateAction(e *core.ModelEvent, app *pocketbase.PocketBase) error {
 
 		var useAmount float64
 		var useAccount string
+		var otherAccount string
 		if direction == "from" {
 			useAccount = fromAccount
+			otherAccount = toAccount
 			useAmount = amount * -1
 		} else {
 			useAmount = amount
-			useAccount = account
+			useAccount = toAccount
+			otherAccount = fromAccount
 		}
 
 		form.LoadData(map[string]any{
-			"account":     useAccount,
-			"amount":      useAmount,
-			"transaction": transactionId,
-			"direction":   direction,
+			"account":      useAccount,
+			"otherAccount": otherAccount,
+			"amount":       useAmount,
+			"transaction":  transactionId,
+			"direction":    direction,
+			"bill":         bill,
+			"budget":       budget,
+			"category":     category,
+			"tag":          tag,
+			"date":         date,
+			"description":  description,
 		})
 
 		if err := form.Submit(); err != nil {
@@ -71,10 +87,19 @@ func UpdateAction(e *core.ModelEvent, app *pocketbase.PocketBase) error {
 		if relatedJournalRecord.GetString("direction") == "from" {
 			relatedJournalRecord.Set("amount", rec.GetFloat("amount")*-1)
 			relatedJournalRecord.Set("account", rec.GetString("fromAccount"))
+			relatedJournalRecord.Set("otherAccount", rec.GetString("toAccount"))
 		} else {
 			relatedJournalRecord.Set("amount", rec.GetFloat("amount"))
 			relatedJournalRecord.Set("account", rec.GetString("toAccount"))
+			relatedJournalRecord.Set("otherAccount", rec.GetString("fromAccount"))
 		}
+
+		relatedJournalRecord.Set("description", rec.GetString("description"))
+		relatedJournalRecord.Set("date", rec.GetString("date"))
+		relatedJournalRecord.Set("bill", rec.GetString("bill"))
+		relatedJournalRecord.Set("budget", rec.GetString("budget"))
+		relatedJournalRecord.Set("category", rec.GetString("category"))
+		relatedJournalRecord.Set("tag", rec.GetString("tag"))
 
 		if err := app.Dao().SaveRecord(relatedJournalRecord); err != nil {
 			return err

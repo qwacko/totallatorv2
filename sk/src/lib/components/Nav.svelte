@@ -5,6 +5,7 @@
   const links = [
     ["Home", "/"],
     ["Transactions", "/transactions/"],
+    ["Journals", "/journals/"],
     ["Accounts", "/accounts/"],
     ["Tags", "/tags/"],
     ["Categories", "/categories/"],

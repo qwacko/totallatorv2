@@ -95,7 +95,7 @@ func BulkAddTransactions(app *pocketbase.PocketBase) func(echo.Context) error {
 			return err
 		}
 
-		log.Print("Bulk Addition Function Executing")
+		log.Print("Bulk Addition Function Executing !!")
 
 		txError := app.Dao().RunInTransaction(func(txDao *daos.Dao) error {
 			for _, transaction := range u.Data {
