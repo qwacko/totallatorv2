@@ -8,6 +8,9 @@ import (
 	"github.com/pocketbase/pocketbase/tools/hook"
 )
 
+// When a journal is updated, don't allow this to be updated, but stop the proposation and
+// instead update the related transaction with teh same information. This will in turn update the
+// transaction to be the same as the submitted changes
 func PreUpdate(e *core.RecordUpdateEvent, app *pocketbase.PocketBase) error {
 
 	rec := e.Record
