@@ -5,7 +5,11 @@
 
   const actionHandler = async () => {
     loading = true;
+    const start = performance.now();
     await clickFunction();
+    const end = performance.now();
+    console.log(`Function took ${end - start} milliseconds to complete.`);
+
     loading = false;
   };
 

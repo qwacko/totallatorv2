@@ -71,7 +71,7 @@ func BulkDeleteTransactions(app *pocketbase.PocketBase) func(echo.Context) error
 
 type BulkTransactionSingle struct {
 	Description string  `json:"description"`
-	Date        string  `json:"date"`
+	DateText    string  `json:"dateText"`
 	FromAccount string  `json:"fromAccount"`
 	ToAccount   string  `json:"toAccount"`
 	Amount      float32 `json:"amount"`
@@ -107,7 +107,7 @@ func BulkAddTransactions(app *pocketbase.PocketBase) func(echo.Context) error {
 				form := forms.NewRecordUpsert(app, record)
 				form.SetDao(txDao)
 				form.LoadData(map[string]any{
-					"date":        transaction.Date,
+					"dateText":    transaction.DateText,
 					"description": transaction.Description,
 					"fromAccount": transaction.FromAccount,
 					"toAccount":   transaction.ToAccount,

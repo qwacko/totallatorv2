@@ -15,7 +15,7 @@ export const bulkDeleteAllTransactions = async () => {
     //     "Content-Type": "application/json",
     //   },
     // });
-    returnData.response = await response2.text();
+    returnData.response = "Done";
   } catch (e) {
     console.log("Error Deleting Transaction", e);
     returnData.error = "Error Deleting All Transactions";
@@ -35,7 +35,7 @@ export const bulkCreateTransactions = async (data: TransactionsRecord[]) => {
         "Content-Type": "application/json",
       },
     });
-    const responseText = await response.text();
+    const responseText = "Done";
     returnData["response"] = responseText;
   } catch (e) {
     console.log("Error Adding Bulk Transactions", e);

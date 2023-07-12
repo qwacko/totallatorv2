@@ -11,6 +11,18 @@ import (
 	"github.com/pocketbase/pocketbase/tools/hook"
 )
 
+// Makes sure the date is updated from teh dateText field
+func PreCreateUpdateAction(e *core.ModelEvent, app *pocketbase.PocketBase) error {
+	rec := e.Model.(*models.Record)
+
+	dateText := rec.GetString("dateText")
+	date := dateText + "T00:00:00.000Z"
+
+	rec.Set("date", date)
+
+	return nil
+}
+
 func CreateAction(e *core.ModelEvent, app *pocketbase.PocketBase) error {
 	rec := e.Model.(*models.Record)
 
@@ -28,7 +40,10 @@ func CreateAction(e *core.ModelEvent, app *pocketbase.PocketBase) error {
 	budget := rec.GetString("budget")
 	category := rec.GetString("category")
 	tag := rec.GetString("tag")
-	date := rec.GetString("date")
+
+	dateText := rec.GetString("dateText")
+	date := dateText + "T00:00:00.000Z"
+
 	description := rec.GetString("description")
 	transactionId := rec.GetId()
 
@@ -61,6 +76,7 @@ func CreateAction(e *core.ModelEvent, app *pocketbase.PocketBase) error {
 			"category":     category,
 			"tag":          tag,
 			"date":         date,
+			"dateText":     dateText,
 			"description":  description,
 		})
 
@@ -96,6 +112,7 @@ func UpdateAction(e *core.ModelEvent, app *pocketbase.PocketBase) error {
 
 		relatedJournalRecord.Set("description", rec.GetString("description"))
 		relatedJournalRecord.Set("date", rec.GetString("date"))
+		relatedJournalRecord.Set("dateText", rec.GetString("dateText"))
 		relatedJournalRecord.Set("bill", rec.GetString("bill"))
 		relatedJournalRecord.Set("budget", rec.GetString("budget"))
 		relatedJournalRecord.Set("category", rec.GetString("category"))

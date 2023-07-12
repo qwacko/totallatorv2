@@ -84,8 +84,9 @@ export type JournalsRecord = {
 	budget?: RecordIdString
 	category?: RecordIdString
 	tag?: RecordIdString
-	date: IsoDateString
+	date?: IsoDateString
 	description?: string
+	dateText: string
 }
 
 export type TagsRecord = {
@@ -103,7 +104,8 @@ export type TransactionsRecord = {
 	bill?: RecordIdString
 	budget?: RecordIdString
 	category?: RecordIdString
-	date: IsoDateString
+	dateText: string
+	date?: IsoDateString
 }
 
 export enum UsersRoleOptions {

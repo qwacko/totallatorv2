@@ -11,6 +11,7 @@
         { key: "transaction.date", dir: "desc" },
         { key: "amount", dir: "desc" },
       ],
+      expand: "account.title"
     },
   });
 </script>

@@ -68,7 +68,7 @@ export const createTransaction = async (
       const toAccountAsset = isTransfer || isDeposit;
 
       return {
-        date: getRandomDate().toISOString(),
+        dateText: getRandomDate().toISOString().slice(0, 10),
         description: `${
           isTransfer ? "Transfer" : isDeposit ? "Deposit" : "Withdrawl"
         } ${getRandomInteger(1000)}`,

@@ -11,6 +11,7 @@ import (
 
 	"totallatorv2/lib/bulkTransactionHandlers"
 	"totallatorv2/lib/helpers"
+	"totallatorv2/lib/journalActions"
 	"totallatorv2/lib/transactionActions"
 
 	// hooks "pocketbase/hooks"
@@ -61,11 +62,23 @@ func main() {
 		Automigrate:  true,
 	})
 
+	app.OnRecordBeforeUpdateRequest("journals").Add(func(e *core.RecordUpdateEvent) error {
+		return journalActions.PreUpdate(e, app)
+	})
+
+	app.OnModelBeforeUpdate("transactions").Add(func(e *core.ModelEvent) error {
+		return transactionActions.PreCreateUpdateAction(e, app)
+	})
+
 	// When updating a transaction record, this will also update the related journals with the correct amount and account.
 	// Note that this runs regardless of if the amount / account has changed to ensure that the related journals are always correct and
 	// subscribers to the journals collection will always be notified of the change.
 	app.OnModelAfterUpdate("transactions").Add(func(e *core.ModelEvent) error {
 		return transactionActions.UpdateAction(e, app)
+	})
+
+	app.OnModelBeforeCreate("transactions").Add(func(e *core.ModelEvent) error {
+		return transactionActions.PreCreateUpdateAction(e, app)
 	})
 
 	// After Creating a Transaction, this will also create the related journals.
