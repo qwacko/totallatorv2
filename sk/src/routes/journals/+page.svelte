@@ -1,6 +1,7 @@
 <script lang="ts">
   import { metadata } from "$lib/app/stores";
   import { pbAccounts } from "$lib/pocketbase/pbAccounts";
+  import TextInputForm from "./TextInputForm.svelte";
 
   $metadata.title = "Journals";
 
@@ -11,7 +12,7 @@
         { key: "transaction.date", dir: "desc" },
         { key: "amount", dir: "desc" },
       ],
-      expand: "account.title"
+      expand: "account.title",
     },
   });
 </script>
@@ -24,6 +25,7 @@
     class="flex border"
   />
 </div>
+
 {#if $resultStore?.items}
   <table>
     {#each $resultStore.items as currentJournal}
@@ -31,12 +33,23 @@
         <td>
           <button
             class="border border-gray-600 px-2 py-1 rounded-md bg-gray-200"
-            on:click={() =>
-              pbAccounts.journals.delete(currentJournal.id)}>x</button
+            on:click={() => pbAccounts.journals.delete(currentJournal.id)}
+            >x</button
           >
         </td>
         <td>{new Date(currentJournal.date).toISOString().slice(0, 10)}</td>
         <td>{currentJournal.description}</td>
+        <td>
+          <TextInputForm
+            value={currentJournal.description}
+            updateAction={(newValue) => {
+              pbAccounts.journals.update({
+                id: currentJournal.id,
+                data: { description: newValue },
+              });
+            }}
+          />
+        </td>
         <td>{currentJournal.account}</td>
         <td>{currentJournal.amount}</td>
       </tr>

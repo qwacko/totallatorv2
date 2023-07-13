@@ -9,7 +9,7 @@ export type RecordListQueryParamsWithoutFilterSort = {
 
 export type RecordListQueryParamsOriginal<
   FilterType extends Record<string, any>,
-  SortType extends Array<Record<string, any>>
+  SortType extends Array<Record<string, any>>,
 > = {
   page?: number;
   perPage?: number;
@@ -20,7 +20,7 @@ export type RecordListQueryParamsOriginal<
 
 export type RecordListQueryParamsStoreParameters<
   FilterType extends Record<string, any>,
-  SortType extends Array<Record<string, any>>
+  SortType extends Array<Record<string, any>>,
 > = {
   filterToText: (filter: FilterType) => string;
   sortToText: (sort: SortType) => string;
@@ -29,7 +29,7 @@ export type RecordListQueryParamsStoreParameters<
 
 export const recordListQueryParamsStore = <
   FilterType extends Record<string, any>,
-  SortType extends Array<Record<string, any>>
+  SortType extends Array<Record<string, any>>,
 >({
   filterToText,
   sortToText,

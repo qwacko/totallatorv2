@@ -7,7 +7,7 @@ export const pocketbaseHelper = <
   ResponseType extends Record<string, any> & BaseSystemFields<unknown>,
   FilterType extends Record<string, any>,
   SortType extends Array<Record<string, any>>,
-  RecordType = PBRecord
+  RecordType = PBRecord,
 >({
   collection,
   filterToText,

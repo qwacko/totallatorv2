@@ -27,7 +27,7 @@
     "pocketbase-typegen": "^1.1.11",
     "postcss": "^8.4.25",
     "postcss-load-config": "^4.0.1",
-    "prettier": "^3.0.0",
+    "prettier": "^2.8.8",
     "prettier-plugin-svelte": "^2.10.1",
     "sass": "^1.63.6",
     "svelte": "^4.0.5",
@@ -41,6 +41,7 @@
   "type": "module",
   "dependencies": {
     "pocketbase": "^0.15.2",
+    "prettier-plugin-tailwindcss": "^0.4.0",
     "typed-pocketbase": "0.0.3"
   }
 }

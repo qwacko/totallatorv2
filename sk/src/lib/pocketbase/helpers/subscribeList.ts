@@ -14,7 +14,7 @@ export type ExportFilteredStoreParams = {
 
 export type SubscribeListInnerParams<
   FilterType extends Record<string, any>,
-  SortType extends Array<Record<string, any>>
+  SortType extends Array<Record<string, any>>,
 > = Omit<
   ExportFilteredStoreParams,
   "initialQueryParams" | "idOrName" | "collection"
@@ -24,7 +24,7 @@ export type SubscribeListInnerParams<
 
 export type SubscribeListOuterType<
   FilterType extends Record<string, any>,
-  SortType extends Array<Record<string, any>>
+  SortType extends Array<Record<string, any>>,
 > = {
   collection: RecordService;
   filterToText: (data: FilterType) => string;
@@ -35,7 +35,7 @@ export type SubscribeListOuterType<
 export const subscribeList = <
   ResponseType extends Record<string, any> & BaseSystemFields<unknown>,
   FilterType extends Record<string, any>,
-  SortType extends Array<Record<string, any>>
+  SortType extends Array<Record<string, any>>,
 >({
   collection,
   filterToText,
