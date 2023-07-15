@@ -66,6 +66,10 @@ func main() {
 		return journalActions.PreUpdate(e, app)
 	})
 
+	app.OnRecordBeforeDeleteRequest("journals").Add(func(e *core.RecordDeleteEvent) error {
+		return journalActions.PreDelete(e, app)
+	})
+
 	app.OnModelBeforeUpdate("transactions").Add(func(e *core.ModelEvent) error {
 		return transactionActions.PreCreateUpdateAction(e, app)
 	})

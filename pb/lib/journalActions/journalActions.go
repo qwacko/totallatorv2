@@ -64,3 +64,22 @@ func PreUpdate(e *core.RecordUpdateEvent, app *pocketbase.PocketBase) error {
 	return hook.StopPropagation
 
 }
+
+// When a journal is being deleted, this instead deletes the related transaction
+func PreDelete(e *core.RecordDeleteEvent, app *pocketbase.PocketBase) error {
+	rec := e.Record
+	relatedTransaction, err := app.Dao().FindRecordById("transactions", rec.GetString("transaction"))
+
+	if err != nil {
+		log.Print("Error Finding Related Transaction : ", err)
+		return hook.StopPropagation
+	}
+
+	if err := app.Dao().DeleteRecord(relatedTransaction); err != nil {
+		log.Print("Error Deleting Related Transaction : ", err)
+		return hook.StopPropagation
+	}
+
+	return hook.StopPropagation
+
+}
