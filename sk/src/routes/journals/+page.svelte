@@ -1,7 +1,12 @@
 <script lang="ts">
   import { metadata } from "$lib/app/stores";
   import { pbAccounts } from "$lib/pocketbase/pbAccounts";
+  import AccountSelection from "$lib/components/dropdowns/AccountSelection.svelte";
+  import TagSelection from "$lib/components/dropdowns/TagSelection.svelte";
   import TextInputForm from "./TextInputForm.svelte";
+  import CategorySelection from "$lib/components/dropdowns/CategorySelection.svelte";
+  import BillSelection from "$lib/components/dropdowns/BillSelection.svelte";
+  import BudgetSelection from "$lib/components/dropdowns/BudgetSelection.svelte";
 
   $metadata.title = "Journals";
 
@@ -27,7 +32,7 @@
 </div>
 
 {#if $resultStore?.items}
-  <table>
+  <table class="space-x-0 space-y-0 text-sm">
     {#each $resultStore.items as currentJournal}
       <tr>
         <td>
@@ -38,7 +43,30 @@
           >
         </td>
         <td>{new Date(currentJournal.date).toISOString().slice(0, 10)}</td>
-        <td>{currentJournal.description}</td>
+        <td>
+          <AccountSelection
+            value={currentJournal.account}
+            changeAction={async (newValue) => {
+              console.log("Updating Acccount ", newValue);
+              await pbAccounts.journals.update({
+                id: currentJournal.id,
+                data: { account: newValue },
+              });
+            }}
+          />
+        </td>
+        <td>
+          <AccountSelection
+            value={currentJournal.otherAccount}
+            changeAction={async (newValue) => {
+              console.log("Updating Other Acccount ", newValue);
+              await pbAccounts.journals.update({
+                id: currentJournal.id,
+                data: { otherAccount: newValue },
+              });
+            }}
+          />
+        </td>
         <td>
           <TextInputForm
             value={currentJournal.description}
@@ -50,8 +78,55 @@
             }}
           />
         </td>
-        <td>{currentJournal.account}</td>
         <td>{currentJournal.amount}</td>
+        <td>
+          <TagSelection
+            value={currentJournal.tag}
+            changeAction={async (newValue) => {
+              console.log("Updating Tag", newValue);
+              await pbAccounts.journals.update({
+                id: currentJournal.id,
+                data: { tag: newValue },
+              });
+            }}
+          />
+        </td>
+        <td>
+          <CategorySelection
+            value={currentJournal.category}
+            changeAction={async (newValue) => {
+              console.log("Updating Category", newValue);
+              await pbAccounts.journals.update({
+                id: currentJournal.id,
+                data: { category: newValue },
+              });
+            }}
+          />
+        </td>
+        <td>
+          <BillSelection
+            value={currentJournal.bill}
+            changeAction={async (newValue) => {
+              console.log("Updating Bill", newValue);
+              await pbAccounts.journals.update({
+                id: currentJournal.id,
+                data: { bill: newValue },
+              });
+            }}
+          />
+        </td>
+        <td>
+          <BudgetSelection
+            value={currentJournal.budget}
+            changeAction={async (newValue) => {
+              console.log("Updating Budget", newValue);
+              await pbAccounts.journals.update({
+                id: currentJournal.id,
+                data: { budget: newValue },
+              });
+            }}
+          />
+        </td>
       </tr>
     {/each}
   </table>

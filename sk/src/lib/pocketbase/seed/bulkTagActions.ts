@@ -2,7 +2,7 @@ import { pbAccounts } from "$lib/pocketbase/pbAccounts";
 import { getRandomInteger } from "./getRandom";
 
 export const createTag = async () => {
-  await pbAccounts.categories.add({
+  await pbAccounts.tags.add({
     group: `TagGroup${getRandomInteger(5)}`,
     title: `TagTitle${getRandomInteger(500)}`,
   });
