@@ -7,12 +7,15 @@
   import CategorySelection from "$lib/components/dropdowns/CategorySelection.svelte";
   import BillSelection from "$lib/components/dropdowns/BillSelection.svelte";
   import BudgetSelection from "$lib/components/dropdowns/BudgetSelection.svelte";
+  import { AccountsTypeOptions } from "$lib/pocketbase/generated-types";
 
   $metadata.title = "Journals";
 
   const { paramsStore, resultStore } = pbAccounts.journals.subscribeList({
     initialQueryParams: {
-      filter: { description: "" },
+      filter: {
+        accountType: [AccountsTypeOptions.asset, AccountsTypeOptions.liability],
+      },
       sort: [
         { key: "transaction.date", dir: "desc" },
         { key: "amount", dir: "desc" },
@@ -32,7 +35,7 @@
 </div>
 
 {#if $resultStore?.items}
-  <table class="space-x-0 space-y-0 text-sm">
+  <table class="space-x-0 space-y-0 text-xs">
     {#each $resultStore.items as currentJournal}
       <tr>
         <td>

@@ -1,5 +1,9 @@
 import type { RecordService } from "pocketbase";
-import type { JournalsRecord, JournalsResponse } from "../generated-types";
+import {
+  AccountsTypeOptions,
+  type JournalsRecord,
+  type JournalsResponse,
+} from "../generated-types";
 import { pocketbaseHelper } from "../helpers/pocketbaseHelper";
 
 export type JournalFilterType = {
@@ -8,6 +12,7 @@ export type JournalFilterType = {
     gt?: Date;
     lt?: Date;
   };
+  accountType?: AccountsTypeOptions[];
 };
 
 export const journalFilter = (filter: JournalFilterType) => {
@@ -20,6 +25,12 @@ export const journalFilter = (filter: JournalFilterType) => {
   }
   if (filter.date && filter.date.lt) {
     filterArray.push(`transaction.date <= ${filter.date.lt.toISOString()}`);
+  }
+  if (filter.accountType && filter.accountType.length > 0) {
+    const newText = `(${filter.accountType
+      .map((item) => `account.type = "${item}"`)
+      .join(" || ")})`;
+    filterArray.push(newText);
   }
 
   return filterArray.join(" && ");
@@ -58,7 +69,9 @@ export const journals = (collection: RecordService) =>
     filterToText: journalFilter,
     sortToText: transactionSort,
     defaultQueryParams: {
-      filter: { description: "" },
+      filter: {
+        accountType: [AccountsTypeOptions.asset, AccountsTypeOptions.liability],
+      },
       sort: [{ key: "transaction.date", dir: "desc" }],
     },
   });
