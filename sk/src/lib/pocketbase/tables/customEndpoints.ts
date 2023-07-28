@@ -1,6 +1,21 @@
 import { client } from "..";
 import type { TransactionsRecord } from "../generated-types";
 
+export const bulkCloneTransactions = async (ids: string[]) => {
+  const returnData: { error?: string; response?: string } = {};
+  try {
+    const response2 = await client.send("/api/custom/cloneBulkTransactions", {
+      method: "POST",
+      body: JSON.stringify({ ids }),
+    });
+    returnData.response = "Done";
+  } catch (e) {
+    console.log("Error Deleting Transaction", e);
+    returnData.error = "Error Deleting All Transactions";
+  }
+  return returnData;
+};
+
 export const bulkDeleteAllTransactions = async () => {
   const returnData: { error?: string; response?: string } = {};
   try {
@@ -71,4 +86,5 @@ export const customEndpoints = {
   bulkCreateTransactions,
   bulkDeleteTransactions,
   bulkDeleteAllTransactions,
+  bulkCloneTransactions,
 };

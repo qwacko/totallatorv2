@@ -8,6 +8,9 @@
   import BillSelection from "$lib/components/dropdowns/BillSelection.svelte";
   import BudgetSelection from "$lib/components/dropdowns/BudgetSelection.svelte";
   import { AccountsTypeOptions } from "$lib/pocketbase/generated-types";
+  import ButtonModal from "./ButtonModal.svelte";
+  import Button from "./Button.svelte";
+  import { bulkCloneTransactions } from "$lib/pocketbase/tables/customEndpoints";
 
   $metadata.title = "Journals";
 
@@ -25,7 +28,7 @@
   });
 </script>
 
-<div class="flex flex-col gap-1 items-start px-2 pb-4">
+<div class="flex flex-col items-start gap-1 px-2 pb-4">
   <div>Description Filter</div>
   <input
     bind:value={$paramsStore.filter.description}
@@ -35,15 +38,41 @@
 </div>
 
 {#if $resultStore?.items}
-  <table class="space-x-0 space-y-0 text-xs">
+  <table class="space-x-2 space-y-2 text-xs">
     {#each $resultStore.items as currentJournal}
       <tr>
         <td>
           <button
-            class="border border-gray-600 px-2 py-1 rounded-md bg-gray-200"
+            class="rounded-md border border-gray-600 bg-gray-200 px-2 py-1"
             on:click={() => pbAccounts.journals.delete(currentJournal.id)}
             >x</button
           >
+          <button
+            class="rounded-md border border-gray-600 bg-gray-200 px-2 py-1"
+            on:click={() =>
+              pbAccounts.customEndpoints.bulkCloneTransactions([
+                currentJournal.transaction,
+              ])}>C</button
+          >
+
+          <ButtonModal />
+          <div class="inline-flex gap-0" role="group">
+            <Button
+              color="red"
+              style="danger"
+              on:click={() => pbAccounts.journals.delete(currentJournal.id)}
+              grouped={true}>x</Button
+            >
+            <Button
+              color="blue"
+              style="danger"
+              on:click={() =>
+                pbAccounts.customEndpoints.bulkCloneTransactions([
+                  currentJournal.transaction,
+                ])}
+              grouped={true}>C</Button
+            >
+          </div>
         </td>
         <td>{new Date(currentJournal.date).toISOString().slice(0, 10)}</td>
         <td>

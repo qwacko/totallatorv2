@@ -85,6 +85,61 @@ type TestBulkData struct {
 	Data []BulkTransactionSingle `json:"data"`
 }
 
+type BulkCloneTransaction struct {
+	IDs []string `json:"ids"`
+}
+
+func BulkCloneTransactions(app *pocketbase.PocketBase) func(echo.Context) error {
+	return func(c echo.Context) (err error) {
+		u := new(BulkCloneTransaction)
+		collection, _ := app.Dao().FindCollectionByNameOrId("transactions")
+		if err := c.Bind(u); err != nil {
+			log.Print("Data Load Error : ", err)
+			return err
+		}
+
+		txError := app.Dao().RunInTransaction(func(txDao *daos.Dao) error {
+			for _, transactionId := range u.IDs {
+
+				transaction, err := txDao.FindRecordById("transactions", transactionId)
+
+				if err != nil {
+					log.Print("Record Finding Error : ", err)
+					return err
+				}
+
+				record := models.NewRecord(collection)
+
+				form := forms.NewRecordUpsert(app, record)
+				form.SetDao(txDao)
+				form.LoadData(map[string]any{
+					"dateText":    transaction.GetString("dateText"),
+					"description": transaction.GetString("description"),
+					"fromAccount": transaction.GetString("fromAccount"),
+					"toAccount":   transaction.GetString("toAccount"),
+					"amount":      transaction.GetFloat("amount"),
+					"tag":         transaction.GetString("tag"),
+					"bill":        transaction.GetString("bill"),
+					"budget":      transaction.GetString("budget"),
+					"category":    transaction.GetString("category"),
+				})
+
+				if err := form.Submit(); err != nil {
+					log.Print("Error Storing Data : ", err)
+					return err
+				}
+
+			}
+			return nil
+		})
+		if txError != nil {
+			return txError
+		}
+		return c.String(http.StatusOK, "Complete")
+
+	}
+}
+
 func BulkAddTransactions(app *pocketbase.PocketBase) func(echo.Context) error {
 
 	return func(c echo.Context) (err error) {

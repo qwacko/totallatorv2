@@ -109,6 +109,16 @@ func main() {
 
 		e.Router.AddRoute(echo.Route{
 			Method: http.MethodPost,
+			Path:   "/api/custom/cloneBulkTransactions",
+			Middlewares: []echo.MiddlewareFunc{
+				apis.ActivityLogger(app),
+				helpers.AdminRoleRequired(app),
+			},
+			Handler: bulkTransactionHandlers.BulkCloneTransactions(app),
+		})
+
+		e.Router.AddRoute(echo.Route{
+			Method: http.MethodPost,
 			Path:   "/api/custom/deleteBulkTransactions",
 			Middlewares: []echo.MiddlewareFunc{
 				apis.ActivityLogger(app),
