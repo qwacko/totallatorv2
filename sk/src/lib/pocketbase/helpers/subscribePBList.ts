@@ -10,7 +10,7 @@ import type { BaseSystemFields } from "../generated-types";
 export const subscribePBList = <
   ReturnType extends Record<string, any> & BaseSystemFields<unknown>,
   FilterType extends Record<string, any>,
-  SortType extends Array<Record<string, any>>
+  SortType extends Array<Record<string, any>>,
 >({
   filterToText,
   sortToText,
