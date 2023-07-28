@@ -83,7 +83,19 @@
       clickFunction={async () =>
         generateTransactions({ transferCount: 5, incExpCount: 15 })}
     >
-      Create Transactions
+      Create 20 Transactions
+    </BulkButton>
+    <BulkButton
+      clickFunction={async () =>
+        generateTransactions({ transferCount: 300, incExpCount: 700 })}
+    >
+      Create 1000 Transactions
+    </BulkButton>
+    <BulkButton
+      clickFunction={async () =>
+        generateTransactions({ transferCount: 1500, incExpCount: 3500 })}
+    >
+      Create 5000 Transactions
     </BulkButton>
     <BulkButton clickFunction={removeTransactions}>
       Remove Transactions

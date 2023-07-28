@@ -1,16 +1,16 @@
 <script lang="ts">
+  import Button from "./Button.svelte";
   import Modal from "./Modal.svelte";
 
-  let showModal = false;
+  export let showModal = false;
+  export let buttonText = "Accept";
+  export let cancelText = "Cancel";
+  export let title: string;
+  export let action: () => void = () => {};
 </script>
 
-<button on:click={() => (showModal = true)}>Open Modal</button>
-<Modal
-  bind:showModal
-  buttonText="Go"
-  cancelText="Cancel"
-  title="Modal Title"
-  on:action={(e) => console.log(e)}
->
-  This Is The Modal Content</Modal
+<Button on:click={() => (showModal = true)} {...$$restProps}><slot /></Button>
+
+<Modal bind:showModal {buttonText} {cancelText} {title} on:action={action}>
+  <slot name="modalContent" /></Modal
 >

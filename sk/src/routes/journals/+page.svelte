@@ -42,26 +42,15 @@
     {#each $resultStore.items as currentJournal}
       <tr>
         <td>
-          <button
-            class="rounded-md border border-gray-600 bg-gray-200 px-2 py-1"
-            on:click={() => pbAccounts.journals.delete(currentJournal.id)}
-            >x</button
-          >
-          <button
-            class="rounded-md border border-gray-600 bg-gray-200 px-2 py-1"
-            on:click={() =>
-              pbAccounts.customEndpoints.bulkCloneTransactions([
-                currentJournal.transaction,
-              ])}>C</button
-          >
-
-          <ButtonModal />
           <div class="inline-flex gap-0" role="group">
-            <Button
+            <ButtonModal
               color="red"
-              style="danger"
-              on:click={() => pbAccounts.journals.delete(currentJournal.id)}
-              grouped={true}>x</Button
+              action={() => pbAccounts.journals.delete(currentJournal.id)}
+              title="Delete Transaction?"
+            >
+              x<svelte-fragment slot="modalContent">
+                Delete?
+              </svelte-fragment></ButtonModal
             >
             <Button
               color="blue"
@@ -69,8 +58,7 @@
               on:click={() =>
                 pbAccounts.customEndpoints.bulkCloneTransactions([
                   currentJournal.transaction,
-                ])}
-              grouped={true}>C</Button
+                ])}>C</Button
             >
           </div>
         </td>
