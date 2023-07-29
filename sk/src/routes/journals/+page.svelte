@@ -11,6 +11,9 @@
   import ButtonModal from "./ButtonModal.svelte";
   import Button from "./Button.svelte";
   import { bulkCloneTransactions } from "$lib/pocketbase/tables/customEndpoints";
+  import Icon from "@iconify/svelte";
+  import ButtonPopover from "./ButtonPopover.svelte";
+  import CurrencyInputForm from "./CurrencyInputForm.svelte";
 
   $metadata.title = "Journals";
 
@@ -43,22 +46,23 @@
       <tr>
         <td>
           <div class="inline-flex gap-0" role="group">
-            <ButtonModal
+            <ButtonPopover
               color="red"
               action={() => pbAccounts.journals.delete(currentJournal.id)}
-              title="Delete Transaction?"
+              buttonText="Delete"
             >
-              x<svelte-fragment slot="modalContent">
-                Delete?
-              </svelte-fragment></ButtonModal
-            >
+              <Icon icon="mdi:delete" />
+              <svelte:fragment slot="content">
+                <div class="text-xs">Delete Transaction?</div>
+              </svelte:fragment>
+            </ButtonPopover>
             <Button
               color="blue"
               style="danger"
               on:click={() =>
                 pbAccounts.customEndpoints.bulkCloneTransactions([
                   currentJournal.transaction,
-                ])}>C</Button
+                ])}><Icon icon="mdi:content-copy" /></Button
             >
           </div>
         </td>
@@ -98,7 +102,17 @@
             }}
           />
         </td>
-        <td>{currentJournal.amount}</td>
+        <td>
+          <CurrencyInputForm
+            value={currentJournal.amount}
+            updateAction={(newValue) => {
+              pbAccounts.journals.update({
+                id: currentJournal.id,
+                data: { amount: newValue },
+              });
+            }}
+          />
+        </td>
         <td>
           <TagSelection
             value={currentJournal.tag}
