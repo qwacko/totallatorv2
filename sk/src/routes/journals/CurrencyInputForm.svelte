@@ -8,15 +8,11 @@
   export let updateAction: (newValue: number) => void | Promise<void>;
   export let showLabel = false;
 
-  $: internalValue = formatCurrency(value);
-
   let loading = false;
 
-  $: console.log("External value", value);
+  $: internalValue = formatCurrency(value);
   $: changed = value !== formatNumber(tidyCurrency(internalValue));
   $: negative = formatNumber(tidyCurrency(internalValue)) < 0;
-
-  $: console.log("Changed", changed);
 
   const handleKeypress = (
     e: KeyboardEvent & {

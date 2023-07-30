@@ -11,6 +11,7 @@
   export let showLabel = false;
 
   $: internalValue = value;
+  $: changed = value !== internalValue;
 
   let loading = false;
 
@@ -51,6 +52,7 @@
     type="text"
     id="inputItem"
     class="h-10 w-[300px] rounded-md px-3 py-2 text-gray-700 border"
+    class:bg-blue-100={changed}
     disabled={loading}
     bind:value={internalValue}
     on:blur={handleChange}
