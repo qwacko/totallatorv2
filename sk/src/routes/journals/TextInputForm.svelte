@@ -22,7 +22,7 @@
     if (e.code === "Enter") {
       handleChange();
     }
-    if (e.code === "Esc") {
+    if (e.code === "Escape") {
       internalValue = value;
     }
   };
@@ -54,6 +54,6 @@
     disabled={loading}
     bind:value={internalValue}
     on:blur={handleChange}
-    on:keypress={handleKeypress}
+    on:keyup={handleKeypress}
   />
 </div>

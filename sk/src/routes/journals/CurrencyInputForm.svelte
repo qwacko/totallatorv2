@@ -1,18 +1,22 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { createLabel } from "@melt-ui/svelte";
+  import { debounce } from "lodash";
 
   const root = createLabel();
-
-  const dispatch = createEventDispatcher();
 
   export let value: number;
   export let updateAction: (newValue: number) => void | Promise<void>;
   export let showLabel = false;
 
-  $: internalValue = value;
+  $: internalValue = formatCurrency(value);
 
   let loading = false;
+
+  $: console.log("External value", value);
+  $: changed = value !== formatNumber(tidyCurrency(internalValue));
+  $: negative = formatNumber(tidyCurrency(internalValue)) < 0;
+
+  $: console.log("Changed", changed);
 
   const handleKeypress = (
     e: KeyboardEvent & {
@@ -22,17 +26,46 @@
     if (e.code === "Enter") {
       handleChange();
     }
-    if (e.code === "Esc") {
-      internalValue = value;
+    if (e.code === "Escape") {
+      internalValue = formatCurrency(value);
     }
   };
 
   const handleChange = async () => {
-    if (value !== internalValue) {
+    if (changed) {
       loading = true;
-      await updateAction(internalValue);
+      await updateAction(formatNumber(tidyCurrency(internalValue)));
       loading = false;
     }
+  };
+
+  const formatCurrency = (value: number) => {
+    const currencyValue = value.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    return currencyValue;
+  };
+
+  const formatNumber = (value: string) => {
+    return parseFloat(value.replace(/[^0-9.-]+/g, ""));
+  };
+
+  const tidyCurrency = (value: string) => {
+    return formatCurrency(formatNumber(value));
+  };
+
+  const debouncedUpdate = debounce(async () => {
+    // Tidy up the value
+    internalValue = tidyCurrency(internalValue);
+  }, 1000);
+
+  const handleInput = (e: InputEvent & { target: HTMLInputElement }) => {
+    internalValue = e.target.value;
+    debouncedUpdate();
   };
 </script>
 
@@ -48,12 +81,15 @@
     </label>
   {/if}
   <input
-    type="number"
+    value={internalValue}
+    type="string"
     id="inputItem"
-    class="h-10 w-[100px] rounded-md px-3 py-2 text-gray-700 border"
+    class="h-10 w-[100px] rounded-md px-3 py-2 text-gray-700 border text-right font-bold"
+    class:bg-blue-200={changed}
+    class:text-red-400={negative}
     disabled={loading}
-    bind:value={internalValue}
+    on:input={handleInput}
     on:blur={handleChange}
-    on:keypress={handleKeypress}
+    on:keyup={handleKeypress}
   />
 </div>
