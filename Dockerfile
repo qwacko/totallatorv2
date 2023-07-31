@@ -1,3 +1,5 @@
+# TODO : Make Sure This Actually Works
+
 FROM golang:1.20-alpine AS builder
 WORKDIR /build
 COPY pb/go.mod pb/go.sum pb/main.go ./
