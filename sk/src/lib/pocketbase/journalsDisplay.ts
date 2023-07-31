@@ -54,10 +54,7 @@ export const journalsDisplay = (initialParams: JournalsParams) =>
           return;
         }
 
-        console.log("Total Amount", totalDataResult.total);
-
         if (journalDataResult.page !== page) {
-          console.log("Page is not the same, resetting");
           setParams({ ...params, page: journalDataResult.page });
           return;
         }

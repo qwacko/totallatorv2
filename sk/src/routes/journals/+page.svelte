@@ -3,16 +3,16 @@
   import { pbAccounts } from "$lib/pocketbase/pbAccounts";
   import AccountSelection from "$lib/components/dropdowns/AccountSelection.svelte";
   import TagSelection from "$lib/components/dropdowns/TagSelection.svelte";
-  import TextInputForm from "./TextInputForm.svelte";
-  import DateInputForm from "./DateInputForm.svelte";
+  import TextInputForm from "$lib/components/TextInputForm.svelte";
+  import DateInputForm from "$lib/components/DateInputForm.svelte";
   import CategorySelection from "$lib/components/dropdowns/CategorySelection.svelte";
   import BillSelection from "$lib/components/dropdowns/BillSelection.svelte";
   import BudgetSelection from "$lib/components/dropdowns/BudgetSelection.svelte";
   import { AccountsTypeOptions } from "$lib/pocketbase/generated-types";
-  import Button from "./Button.svelte";
+  import Button from "$lib/components/Button.svelte";
   import Icon from "@iconify/svelte";
-  import ButtonPopover from "./ButtonPopover.svelte";
-  import CurrencyInputForm from "./CurrencyInputForm.svelte";
+  import ButtonPopover from "$lib/components/ButtonPopover.svelte";
+  import CurrencyInputForm from "$lib/components/CurrencyInputForm.svelte";
   import { createPagination } from "@melt-ui/svelte";
 
   $metadata.title = "Journals";

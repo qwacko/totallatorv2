@@ -46,7 +46,9 @@
   }
 </script>
 
-<svelte:window on:unhandledrejection={(e) => alerts.error(e.reason.toString())} />
+<svelte:window
+  on:unhandledrejection={(e) => alerts.error(e.reason.toString())}
+/>
 
 <article>
   {#if $alerts.length > 1}

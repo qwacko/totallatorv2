@@ -36,6 +36,3 @@
     >Next</button
   >
 {/if}
-<form on:submit|preventDefault={(e) => console.log(e)}>
-  <input type="text" id="title" />
-</form>
