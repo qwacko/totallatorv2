@@ -1,11 +1,7 @@
 import type { ListResult, RecordService } from "pocketbase";
-import {
-  recordListQueryParamsStore,
-  type RecordListQueryParamsStoreParameters,
-} from "./recordListQueryParamsStore";
-import { derived, readable, writable } from "svelte/store";
-import { browser } from "$app/environment";
+import type { RecordListQueryParamsStoreParameters } from "./recordListQueryParamsStore";
 import type { BaseSystemFields } from "../generated-types";
+import { subscribePB } from "./subscribePBGeneral";
 
 export const subscribePBList = <
   ReturnType extends Record<string, any> & BaseSystemFields<unknown>,
@@ -19,60 +15,53 @@ export const subscribePBList = <
 }: RecordListQueryParamsStoreParameters<FilterType, SortType> & {
   collection: RecordService;
 }) => {
-  const { paramsStore, transformedParamsStore } = recordListQueryParamsStore({
-    filterToText,
-    sortToText,
-    initialParams,
-  });
+  const dataUpdater = ({
+    params,
+    setParams,
+    setData,
+  }: {
+    params: RecordListQueryParamsStoreParameters<
+      FilterType,
+      SortType
+    >["initialParams"];
+    setParams: (
+      d: RecordListQueryParamsStoreParameters<
+        FilterType,
+        SortType
+      >["initialParams"]
+    ) => void;
+    setData: (newData: ListResult<ReturnType>) => void;
+  }) => {
+    console.log("Running Data Updater");
+    const page = params.page || 0;
+    const perPage = params.perPage || 20;
 
-  const date = new Date();
-  const subscriptionStore = readable(date, (set) => {
-    if (browser) {
-      const triggerUnsubscribe = collection.subscribe("*", () => {
-        const subscribeDate = new Date();
-        set(subscribeDate);
-      });
-
-      const unsubFunction = () => {
-        const asyncUnsub = async () => {
-          await (
-            await triggerUnsubscribe
-          )();
-        };
-        asyncUnsub();
-      };
-
-      return unsubFunction;
-    }
-    return () => {};
-  });
-
-  const resultStore = derived<
-    [typeof transformedParamsStore, typeof subscriptionStore],
-    ListResult<ReturnType>
-  >([transformedParamsStore, subscriptionStore], (stores, set) => {
-    const [currentQueryParams] = stores;
-
-    const page = currentQueryParams.page || 0;
-    const perPage = currentQueryParams.perPage || 20;
+    const { filter, sort, ...otherParams } = params;
 
     collection
       .getList<ReturnType>(page, perPage, {
         $autoCancel: false,
-        ...currentQueryParams,
+        filter: filterToText(filter),
+        sort: sortToText(sort),
+        ...otherParams,
       })
       .then((newData) => {
+        console.log("Subscription New Data", newData);
         if (newData.totalPages === 0 && newData.page !== 1) {
-          paramsStore.update((v) => ({ ...v, page: 1 }));
+          setParams({ ...params, page: 1 });
           return;
         }
         if (newData.page > newData.totalPages && newData.totalPages > 0) {
-          paramsStore.update((v) => ({ ...v, page: newData.totalPages }));
+          setParams({ ...params, page: newData.totalPages });
           return;
         }
-        set(newData);
+        setData(newData);
       });
-  });
+  };
 
-  return { paramsStore, resultStore };
+  return subscribePB({
+    collections: [collection],
+    dataUpdater,
+    initialParameters: initialParams,
+  });
 };

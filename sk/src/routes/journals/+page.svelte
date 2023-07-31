@@ -8,27 +8,44 @@
   import BillSelection from "$lib/components/dropdowns/BillSelection.svelte";
   import BudgetSelection from "$lib/components/dropdowns/BudgetSelection.svelte";
   import { AccountsTypeOptions } from "$lib/pocketbase/generated-types";
-  import ButtonModal from "./ButtonModal.svelte";
   import Button from "./Button.svelte";
-  import { bulkCloneTransactions } from "$lib/pocketbase/tables/customEndpoints";
   import Icon from "@iconify/svelte";
   import ButtonPopover from "./ButtonPopover.svelte";
   import CurrencyInputForm from "./CurrencyInputForm.svelte";
+  import { createPagination } from "@melt-ui/svelte";
 
   $metadata.title = "Journals";
 
-  const { paramsStore, resultStore } = pbAccounts.journals.subscribeList({
-    initialQueryParams: {
-      filter: {
-        accountType: [AccountsTypeOptions.asset, AccountsTypeOptions.liability],
-      },
-      sort: [
-        { key: "transaction.date", dir: "desc" },
-        { key: "amount", dir: "desc" },
-      ],
-      expand: "account.title",
-    },
+  const {
+    options,
+    prevButton,
+    nextButton,
+    pages,
+    page,
+    pageTrigger,
+    range,
+    root,
+  } = createPagination({
+    count: 0,
+    page: 0,
+    perPage: 20,
+    siblingCount: 2,
   });
+
+  const { paramsStore, resultStore } = pbAccounts.journals.displayWithTotal({
+    filter: {
+      accountType: [AccountsTypeOptions.asset, AccountsTypeOptions.liability],
+    },
+    sort: [
+      { key: "transaction.date", dir: "desc" },
+      { key: "amount", dir: "desc" },
+    ],
+    expand: "account.title",
+  });
+
+  $: $resultStore?.totalItems &&
+    options.update((val) => ({ ...val, count: $resultStore.totalItems }));
+  $: $paramsStore.page = $page;
 </script>
 
 <div class="flex flex-col items-start gap-1 px-2 pb-4">
@@ -41,8 +58,46 @@
 </div>
 
 {#if $resultStore?.items}
+  <div class="font-bold">
+    Count: {$resultStore.totalItems}
+  </div>
+  <nav
+    class="flex flex-col items-center gap-4"
+    aria-label="pagination"
+    melt={$root}
+  >
+    <p class="text-center">
+      Showing items {$range.start} - {$range.end}
+    </p>
+    <div class="flex items-center gap-2">
+      <button
+        class="grid h-8 items-center rounded-sm bg-white px-3 text-sm text-magnum-700 shadow-sm
+      hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-magnum-900
+      data-[selected]:text-white"
+        melt={$prevButton}><Icon icon="mdi:chevron-left" /></button
+      >
+      {#each $pages as page (page.key)}
+        {#if page.type === "ellipsis"}
+          <span>...</span>
+        {:else}
+          <button
+            class="grid h-8 items-center rounded-sm bg-white px-3 text-sm text-magnum-700 shadow-sm
+          hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-magnum-900
+        data-[selected]:text-white"
+            melt={$pageTrigger(page)}>{page.value}</button
+          >
+        {/if}
+      {/each}
+      <button
+        class="grid h-8 items-center rounded-sm bg-white px-3 text-sm text-magnum-700 shadow-sm
+      hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-magnum-900
+    data-[selected]:text-white"
+        melt={$nextButton}><Icon icon="mdi:chevron-right" /></button
+      >
+    </div>
+  </nav>
   <table class="space-x-2 space-y-2 text-xs">
-    {#each $resultStore.items as currentJournal}
+    {#each $resultStore.items as currentJournal, i}
       <tr>
         <td>
           <div class="inline-flex gap-0" role="group">
@@ -112,6 +167,9 @@
               });
             }}
           />
+        </td>
+        <td>
+          {currentJournal.total.toFixed(2)}
         </td>
         <td>
           <TagSelection

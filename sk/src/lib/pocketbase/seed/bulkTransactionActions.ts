@@ -20,39 +20,25 @@ const getRandomDate = () => {
   // const targetDate = startDate + dateDifference;
 };
 
-export const createTransaction = async (
-  isTransfer: boolean = false,
-  count: number
-) => {
-  const allExpenseAccounts = (
-    await pbAccounts.accounts.getList({
-      sort: [],
-      filter: {
-        type: [AccountsTypeOptions.expense, AccountsTypeOptions.income],
-      },
-    })
-  ).items.map((item) => item.id);
-  const allAssetAcccounts = (
-    await pbAccounts.accounts.getList({
-      sort: [],
-      filter: {
-        type: [AccountsTypeOptions.asset, AccountsTypeOptions.liability],
-      },
-    })
-  ).items.map((item) => item.id);
-  const allTags = (
-    await pbAccounts.tags.getList({ sort: [], filter: {} })
-  ).items.map((item) => item.id);
-  const allCategories = (
-    await pbAccounts.categories.getList({ sort: [], filter: {} })
-  ).items.map((item) => item.id);
-  const allBills = (
-    await pbAccounts.bills.getList({ sort: [], filter: {} })
-  ).items.map((item) => item.id);
-  const allBudgets = (
-    await pbAccounts.budgets.getList({ sort: [], filter: {} })
-  ).items.map((item) => item.id);
-
+export const createTransaction = async ({
+  isTransfer = false,
+  count = 0,
+  allAssetAccounts = [],
+  allExpenseAccounts = [],
+  allTags = [],
+  allCategories = [],
+  allBills = [],
+  allBudgets = [],
+}: {
+  isTransfer?: boolean;
+  count?: number;
+  allExpenseAccounts?: string[];
+  allAssetAccounts?: string[];
+  allTags?: string[];
+  allCategories?: string[];
+  allBills?: string[];
+  allBudgets?: string[];
+} = {}) => {
   const returnData = Array(count)
     .fill(1)
     .map(() => {
@@ -73,10 +59,10 @@ export const createTransaction = async (
           isTransfer ? "Transfer" : isDeposit ? "Deposit" : "Withdrawl"
         } ${getRandomInteger(1000)}`,
         fromAccount: getRandomArrayElement(
-          fromAccountAsset ? allAssetAcccounts : allExpenseAccounts
+          fromAccountAsset ? allAssetAccounts : allExpenseAccounts
         ),
         toAccount: getRandomArrayElement(
-          toAccountAsset ? allAssetAcccounts : allExpenseAccounts
+          toAccountAsset ? allAssetAccounts : allExpenseAccounts
         ),
         amount: Math.floor(Math.random() * (isLarge ? 100000 : 10000)) / 100,
         tag: hasTag ? getRandomArrayElement(allTags) : undefined,
@@ -98,9 +84,61 @@ export const generateTransactions = async ({
   transferCount: number;
   incExpCount: number;
 }) => {
+  const allExpenseAccounts = (
+    await pbAccounts.accounts.getList({
+      sort: [],
+      perPage: 100000,
+      filter: {
+        type: [AccountsTypeOptions.expense, AccountsTypeOptions.income],
+      },
+    })
+  ).items.map((item) => item.id);
+  const allAssetAccounts = (
+    await pbAccounts.accounts.getList({
+      sort: [],
+      perPage: 100000,
+      filter: {
+        type: [AccountsTypeOptions.asset, AccountsTypeOptions.liability],
+      },
+    })
+  ).items.map((item) => item.id);
+  const allTags = (
+    await pbAccounts.tags.getList({ sort: [], filter: {}, perPage: 100000 })
+  ).items.map((item) => item.id);
+  const allCategories = (
+    await pbAccounts.categories.getList({
+      sort: [],
+      filter: {},
+      perPage: 100000,
+    })
+  ).items.map((item) => item.id);
+  const allBills = (
+    await pbAccounts.bills.getList({ sort: [], filter: {}, perPage: 100000 })
+  ).items.map((item) => item.id);
+  const allBudgets = (
+    await pbAccounts.budgets.getList({ sort: [], filter: {}, perPage: 100000 })
+  ).items.map((item) => item.id);
   const transactionsToCreate = [
-    ...(await createTransaction(true, transferCount)),
-    ...(await createTransaction(false, incExpCount)),
+    ...(await createTransaction({
+      isTransfer: true,
+      count: transferCount,
+      allAssetAccounts,
+      allExpenseAccounts,
+      allTags,
+      allCategories,
+      allBills,
+      allBudgets,
+    })),
+    ...(await createTransaction({
+      isTransfer: false,
+      count: incExpCount,
+      allAssetAccounts,
+      allExpenseAccounts,
+      allTags,
+      allCategories,
+      allBills,
+      allBudgets,
+    })),
   ];
 
   await pbAccounts.customEndpoints.bulkCreateTransactions(transactionsToCreate);

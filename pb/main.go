@@ -10,6 +10,7 @@ import (
 	//Import transactionCreate.go
 
 	"totallatorv2/lib/bulkTransactionHandlers"
+	"totallatorv2/lib/customQueries"
 	"totallatorv2/lib/helpers"
 	"totallatorv2/lib/journalActions"
 	"totallatorv2/lib/transactionActions"
@@ -92,8 +93,6 @@ func main() {
 
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 
-		log.Print("Starting Server")
-
 		// serves static files from the provided public dir (if exists)
 		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS(publicDirFlag), true))
 
@@ -135,6 +134,15 @@ func main() {
 				helpers.AdminRoleRequired(app),
 			},
 			Handler: bulkTransactionHandlers.BulkAddTransactions(app),
+		})
+
+		e.Router.AddRoute(echo.Route{
+			Method: http.MethodPost,
+			Path:   "/api/custom/getTotal",
+			Middlewares: []echo.MiddlewareFunc{
+				apis.ActivityLogger(app),
+			},
+			Handler: customQueries.TotalJournals(app),
 		})
 
 		e.Router.AddRoute(echo.Route{

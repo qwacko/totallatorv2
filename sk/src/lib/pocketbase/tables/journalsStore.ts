@@ -47,7 +47,7 @@ export type JournalSortType = {
   dir: "asc" | "desc";
 }[];
 
-export const transactionSort = (sort: JournalSortType) => {
+export const journalSort = (sort: JournalSortType) => {
   return sort
     .map((item) => {
       if (item.dir === "desc") {
@@ -67,7 +67,7 @@ export const journals = (collection: RecordService) =>
   >({
     collection,
     filterToText: journalFilter,
-    sortToText: transactionSort,
+    sortToText: journalSort,
     defaultQueryParams: {
       filter: {
         accountType: [AccountsTypeOptions.asset, AccountsTypeOptions.liability],

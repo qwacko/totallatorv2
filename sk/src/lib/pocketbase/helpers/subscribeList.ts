@@ -2,10 +2,7 @@ import type { RecordListQueryParams, RecordService } from "pocketbase";
 import type { BaseSystemFields } from "../generated-types";
 
 import { subscribePBList } from "./subscribePBList";
-import type {
-  RecordListQueryParamsOriginal,
-  RecordListQueryParamsStoreParameters,
-} from "./recordListQueryParamsStore";
+import type { RecordListQueryParamsOriginal } from "./recordListQueryParamsStore";
 
 export type ExportFilteredStoreParams = {
   collection: RecordService;

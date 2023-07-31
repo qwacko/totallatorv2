@@ -1,5 +1,15 @@
 import { client } from "..";
 import type { TransactionsRecord } from "../generated-types";
+import {
+  journalFilter,
+  journalSort,
+  type JournalFilterType,
+  type JournalSortType,
+} from "./journalsStore";
+import {
+  transactionFilter,
+  type TransactionFilterType,
+} from "./transactionsStore";
 
 export const bulkCloneTransactions = async (ids: string[]) => {
   const returnData: { error?: string; response?: string } = {};
@@ -23,13 +33,6 @@ export const bulkDeleteAllTransactions = async () => {
       method: "POST",
       body: JSON.stringify({}),
     });
-    // const response = await fetch("/api/custom/deleteAllTransactions", {
-    //   method: "POST",
-    //   body: JSON.stringify({}),
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // });
     returnData.response = "Done";
   } catch (e) {
     console.log("Error Deleting Transaction", e);
@@ -82,9 +85,42 @@ export const bulkDeleteTransactions = async (data: string[]) => {
   return returnData;
 };
 
+const getTotal = async ({
+  filters,
+  sort,
+  page = 0,
+  perPage = 20,
+}: {
+  filters?: JournalFilterType;
+  sort?: JournalSortType;
+  page?: number;
+  perPage?: number;
+} = {}) => {
+  try {
+    const filterText = filters ? journalFilter(filters) : "";
+    const sortText = sort ? journalSort(sort) : "";
+    const response = await client.send<{ total: number }>(
+      "/api/custom/getTotal",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          query: filterText,
+          sort: sortText,
+          pageNo: page,
+          perPage,
+        }),
+      }
+    );
+    return response;
+  } catch (e) {
+    return { total: null };
+  }
+};
+
 export const customEndpoints = {
   bulkCreateTransactions,
   bulkDeleteTransactions,
   bulkDeleteAllTransactions,
   bulkCloneTransactions,
+  getTotal,
 };
