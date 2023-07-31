@@ -10,6 +10,8 @@
       sort: [{ key: "title", dir: "asc" }],
     },
   });
+
+  //TODO : Make This Have Editing etc... (align with journals structure)
 </script>
 
 <input bind:value={$paramsStore.filter.title} type="text" class="flex" />

@@ -89,6 +89,8 @@ type BulkCloneTransaction struct {
 	IDs []string `json:"ids"`
 }
 
+//TODO : Add bulk "update" functionality. Need to somehow make sure it checks the permissions, to make sure completed items are not updated etc..
+
 func BulkCloneTransactions(app *pocketbase.PocketBase) func(echo.Context) error {
 	return func(c echo.Context) (err error) {
 		u := new(BulkCloneTransaction)

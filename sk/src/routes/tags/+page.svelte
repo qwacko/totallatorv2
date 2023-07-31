@@ -13,6 +13,8 @@
       ],
     },
   });
+
+  //TODO : Make This Have Editing etc... (align with journals structure)
 </script>
 
 <div class="flex flex-col gap-1 items-start px-2 pb-4">

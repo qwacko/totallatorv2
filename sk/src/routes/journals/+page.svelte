@@ -47,6 +47,11 @@
   $: $resultStore?.totalItems &&
     options.update((val) => ({ ...val, count: $resultStore.totalItems }));
   $: $paramsStore.page = $page;
+
+  // TODO : Add Functionality To Have Selection Checkboxes
+  // TODO : Add Buttons to change mode (validated, reconciled, complete etc....)
+  // TODO : Add functionality to add a new journal entry
+  // TODO : Add Bulk Actions Menu, and Bulk Actions
 </script>
 
 <div class="flex flex-col items-start gap-1 px-2 pb-4">
@@ -62,6 +67,8 @@
   <div class="font-bold">
     Count: {$resultStore.totalItems}
   </div>
+
+  <!-- TODO : Pagination needs to be in another file -->
   <nav
     class="flex flex-col items-center gap-4"
     aria-label="pagination"

@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { base } from "$app/paths";
   import { page } from "$app/stores";
-  import Login from "./Login.svelte";
   const links = [
     ["Home", "/"],
     ["Journals", "/journals/"],
@@ -13,6 +11,8 @@
     ["Bulk", "/bulk/"],
     ["Test", "/test/"],
   ].map(([text, href]) => [text, href]);
+
+  //TODO : Add "Stats" page
 </script>
 
 <nav>

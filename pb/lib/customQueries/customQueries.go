@@ -18,6 +18,8 @@ type TotalQuery struct {
 	PageNo  int    `json:"pageNo"`
 }
 
+// TODO : Add A Custom Query To Get Stats. Probably just use a query to get everything, and then perform aggregation in go since it is pretty quick.
+
 func TotalJournals(app *pocketbase.PocketBase) func(echo.Context) error {
 	return func(c echo.Context) (err error) {
 
