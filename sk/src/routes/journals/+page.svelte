@@ -4,6 +4,7 @@
   import AccountSelection from "$lib/components/dropdowns/AccountSelection.svelte";
   import TagSelection from "$lib/components/dropdowns/TagSelection.svelte";
   import TextInputForm from "./TextInputForm.svelte";
+  import DateInputForm from "./DateInputForm.svelte";
   import CategorySelection from "$lib/components/dropdowns/CategorySelection.svelte";
   import BillSelection from "$lib/components/dropdowns/BillSelection.svelte";
   import BudgetSelection from "$lib/components/dropdowns/BudgetSelection.svelte";
@@ -121,7 +122,17 @@
             >
           </div>
         </td>
-        <td>{new Date(currentJournal.date).toISOString().slice(0, 10)}</td>
+        <td>
+          <DateInputForm
+            value={currentJournal.date}
+            updateAction={(newValue) => {
+              pbAccounts.journals.update({
+                id: currentJournal.id,
+                data: { dateText: newValue.substring(0, 10) },
+              });
+            }}
+          />
+        </td>
         <td>
           <AccountSelection
             value={currentJournal.account}
