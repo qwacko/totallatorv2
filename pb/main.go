@@ -38,6 +38,8 @@ func defaultPublicDir() string {
 
 func main() {
 
+	// TODO : Make Sure Journals Cannot Be Edited if they are "Complete", possibly need to add funciton to allow "unsetting".
+
 	app := pocketbase.New()
 
 	var publicDirFlag string
